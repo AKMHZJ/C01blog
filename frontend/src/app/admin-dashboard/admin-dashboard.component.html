@@ -1,0 +1,73 @@
+<div class="admin-dashboard" [ngClass]="isDark ? 'theme-dark' : 'theme-light'">
+  <div class="max-w-6xl mx-auto">
+    
+    <header class="flex justify-between items-end">
+      <div>
+        <h1 class="font-serif text-5xl font-light">Admin Dashboard</h1>
+        <p class="opacity-60 mt-2">Manage users and platform statistics.</p>
+      </div>
+      <button (click)="refresh()" class="btn-primary">Refresh Data</button>
+    </header>
+
+    <div class="flex gap-4 mt-12">
+      <button (click)="setTab('overview')" class="tab-btn" [class.active]="activeTab === 'overview'">Overview</button>
+      <button (click)="setTab('users')" class="tab-btn" [class.active]="activeTab === 'users'">Users</button>
+    </div>
+
+    <div *ngIf="loading" style="padding: 5rem 0; text-align: center; opacity: 0.5;">Loading details...</div>
+
+    <!-- Overview -->
+    <div class="stats-grid" *ngIf="!loading && activeTab === 'overview'">
+      <div class="stat-card">
+        <div class="text-xs uppercase opacity-50">Total Users</div>
+        <div class="value font-serif">{{ overview?.users ?? 0 }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="text-xs uppercase opacity-50">Administrators</div>
+        <div class="value font-serif">{{ overview?.admins ?? 0 }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="text-xs uppercase opacity-50">Stories Published</div>
+        <div class="value font-serif">{{ overview?.posts ?? 0 }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="text-xs uppercase opacity-50">Total Comments</div>
+        <div class="value font-serif">{{ overview?.comments ?? 0 }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="text-xs uppercase opacity-50">Network Follows</div>
+        <div class="value font-serif">{{ overview?.follows ?? 0 }}</div>
+      </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="table-container font-sans" *ngIf="!loading && activeTab === 'users'">
+      <div class="table-header">
+        <div>User</div>
+        <div>Email</div>
+        <div>Role</div>
+        <div>Stories</div>
+        <div style="text-align: right;">Actions</div>
+      </div>
+      <div *ngFor="let u of users" class="table-row">
+        <div>
+          <div style="font-weight: 500;">{{ u.displayName || u.username }}</div>
+          <div style="font-size: 0.75rem; opacity: 0.5;">@{{ u.username }}</div>
+        </div>
+        <div style="opacity: 0.7;">{{ u.email }}</div>
+        <div>
+          <select style="background: transparent; color: inherit; border: 1px solid rgba(128,128,128,0.2); border-radius: 4px; padding: 0.25rem;"
+                  [(ngModel)]="u.role" (ngModelChange)="updateRole(u, u.role)">
+            <option value="USER">USER</option>
+            <option value="ADMIN">ADMIN</option>
+          </select>
+        </div>
+        <div style="opacity: 0.7;">{{ u.postCount ?? 0 }}</div>
+        <div style="text-align: right;">
+          <button (click)="deleteUser(u)" style="color: #ef4444; border: none; background: none; cursor: pointer;">Delete</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

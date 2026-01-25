@@ -1,0 +1,59 @@
+<div class="auth-page" [ngClass]="isDark ? 'theme-dark' : 'theme-light'">
+
+  <button (click)="toggleTheme()" class="icon-btn" style="position: fixed; top: 2rem; right: 2rem; opacity: 0.6; font-size: 0.875rem;">
+    {{ isDark ? 'Light' : 'Dark' }}
+  </button>
+
+  <div class="auth-container">
+    <div class="flex justify-center mb-12">
+      <a routerLink="/" class="logo-wrapper" style="text-decoration: none; color: inherit;">
+        <div class="logo-circle">B</div>
+        <span class="logo-text">Blog Network</span>
+      </a>
+    </div>
+
+    <div class="auth-header">
+      <h1>Create account</h1>
+      <p style="font-family: 'Inter', sans-serif; opacity: 0.6;">
+        Already have an account? <a routerLink="/login" style="color: inherit; text-decoration: underline; text-underline-offset: 4px; transition: opacity 0.3s; &:hover { opacity: 1; }">Log in</a>
+      </p>
+    </div>
+
+    <form [formGroup]="signupForm" (ngSubmit)="handleSubmit()">
+      <div class="form-group">
+        <label>Email</label>
+        <input formControlName="email" type="email" placeholder="you@example.com" autocomplete="email" />
+      </div>
+
+      <div class="form-group">
+        <label>Username</label>
+        <input formControlName="username" type="text" placeholder="username" autocomplete="username" />
+      </div>
+
+      <div class="form-group">
+        <label>Display Name</label>
+        <input formControlName="displayName" type="text" placeholder="Your Name" autocomplete="name" />
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <input formControlName="password" type="password" placeholder="At least 6 characters" autocomplete="new-password" />
+      </div>
+
+      <button type="submit" class="btn-auth">Create Account</button>
+    </form>
+
+    <p class="terms-notice">
+      By creating an account, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+    </p>
+
+    <div class="demo-notice">
+      <p>This is a demo application. Your data will only be stored locally in your browser.</p>
+    </div>
+
+    <div class="footer-links">
+      <a href="#">Terms of Service</a>
+      <a href="#">Privacy Policy</a>
+    </div>
+  </div>
+</div>

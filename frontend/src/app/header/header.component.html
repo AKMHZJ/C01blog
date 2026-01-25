@@ -1,0 +1,39 @@
+<header class="header" [ngClass]="theme.isDark() ? 'theme-dark' : 'theme-light'">
+
+  <div class="header-container">
+
+    <a routerLink="/feed" class="logo-wrapper" style="text-decoration: none; color: inherit;">
+      <div class="logo-circle">B</div>
+      <h1 class="logo-text">Blog Network</h1>
+    </a>
+
+    @if (authService.currentUser(); as u) {
+      <div class="user-area flex items-center gap-8">
+
+        <nav class="nav-links">
+          <a routerLink="/feed" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Feed</a>
+          @if (u.role === 'ADMIN') {
+            <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+          }
+          <a routerLink="/my-blog" routerLinkActive="active">My Blog</a>
+          <a routerLink="/discover" routerLinkActive="active">Discover</a>
+          <a routerLink="/about" routerLinkActive="active">About</a>
+        </nav>
+
+        <div class="user-actions">
+          <button (click)="toggleTheme()" class="icon-btn" title="Toggle theme">
+            <mat-icon style="font-size: 20px; width: 20px; height: 20px;">
+              {{ theme.isDark() ? 'light_mode' : 'dark_mode' }}
+            </mat-icon>
+          </button>
+
+          <img [src]="u.avatar | imageUrl:'https://placehold.co/32'" alt="User" class="avatar">
+
+          <button (click)="logout()" class="icon-btn" title="Logout" style="color: #ef4444; opacity: 1;">
+            <mat-icon style="font-size: 20px; width: 20px; height: 20px;">logout</mat-icon>
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+</header>

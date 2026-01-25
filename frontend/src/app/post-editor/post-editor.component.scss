@@ -1,0 +1,81 @@
+.editor-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 1.5rem;
+}
+
+.editor-modal {
+  width: 100%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 1rem;
+  display: flex;
+  flex-direction: column;
+  
+  &.theme-dark { background: #000; color: #fff; }
+  &.theme-light { background: #fff; color: #000; }
+}
+
+.editor-header {
+  position: sticky;
+  top: 0;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+  background: inherit;
+}
+
+.editor-body {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.input-field {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+  padding: 0.75rem 0;
+  outline: none;
+  font-family: inherit;
+  font-size: 1rem;
+  color: inherit;
+  
+  &:focus { border-bottom-color: #06b6d4; }
+}
+
+.textarea-field {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+  padding: 0.75rem 0;
+  outline: none;
+  font-family: inherit;
+  font-size: 1rem;
+  color: inherit;
+  resize: none;
+  min-height: 200px;
+  
+  &:focus { border-bottom-color: #06b6d4; }
+}
+
+.upload-zone {
+  border: 1px dashed rgba(128, 128, 128, 0.3);
+  padding: 2rem;
+  border-radius: 0.75rem;
+  text-align: center;
+  
+  img { width: 100%; height: 200px; object-fit: cover; border-radius: 0.5rem; margin-top: 1rem; }
+}

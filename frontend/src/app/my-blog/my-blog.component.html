@@ -1,0 +1,102 @@
+<div class="my-blog-page font-sans" [ngClass]="isDark ? 'bg-black text-white' : 'bg-white text-black'">
+  <div class="container">
+    
+    <header class="profile-header">
+      <div class="user-meta">
+        <img [src]="user?.avatar | imageUrl:'https://placehold.co/100'" alt="Avatar">
+        <div>
+          <h1>{{ user?.displayName || user?.username }}</h1>
+          <div class="user-stats">
+            <span>@{{ user?.username }}</span>
+            <span class="dot">·</span>
+            <span>{{ myPosts.length }} stories</span>
+            <span class="dot">·</span>
+            <span>{{ user?.followersCount || 0 }} followers</span>
+            <span class="dot">·</span>
+            <span>{{ user?.followingCount || 0 }} following</span>
+          </div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button (click)="openProfileEditor()" class="action-btn">Edit Profile</button>
+        <button (click)="openEditor()" class="btn-primary">Write a story</button>
+      </div>
+    </header>
+
+    <!-- Profile Editor Modal -->
+    <div class="editor-overlay" *ngIf="showProfileEditor">
+      <div class="editor-modal" [ngClass]="isDark ? 'theme-dark' : 'theme-light'">
+        <div class="editor-header">
+          <h2 class="font-serif text-3xl">Edit Profile</h2>
+          <button (click)="closeProfileEditor()" class="icon-btn">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+        <form (ngSubmit)="handleProfileSave()" class="editor-body">
+          <div class="upload-zone">
+            <input type="file" (change)="onAvatarSelected($event)" accept="image/*" class="hidden" #avatarInput>
+            <div class="avatar-preview-wrapper" (click)="avatarInput.click()">
+              <img [src]="(editAvatar || user?.avatar) | imageUrl:'https://placehold.co/100'" class="avatar-preview">
+              <div class="avatar-overlay">
+                <mat-icon>camera_alt</mat-icon>
+              </div>
+            </div>
+            <p class="text-xs opacity-50 mt-2">Click to change photo</p>
+          </div>
+
+          <div>
+            <label class="text-xs uppercase opacity-50">Display Name</label>
+            <input [(ngModel)]="editDisplayName" name="displayName" required class="input-field" placeholder="Your name...">
+          </div>
+
+          <div>
+            <label class="text-xs uppercase opacity-50">Bio</label>
+            <textarea [(ngModel)]="editBio" name="bio" class="textarea-field" style="min-height: 100px;" placeholder="Tell your story..."></textarea>
+          </div>
+
+          <div class="flex gap-4 pt-4">
+            <button type="submit" [disabled]="isSavingProfile" class="btn-primary" style="flex: 1; padding: 1.25rem;">
+              {{ isSavingProfile ? 'Saving...' : 'Save Changes' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="posts-grid">
+      <div *ngFor="let post of myPosts" class="card-wrapper">
+        <app-blog-card 
+          [title]="post.title"
+          [date]="post.date | date"
+          [image]="post.image"
+          [category]="post.category"
+          [author]="post.author"
+          [likeCount]="post.likes.length"
+          [commentCount]="post.comments.length"
+          (cardClick)="openEditor(post)">
+        </app-blog-card>
+        
+        <div class="card-actions">
+          <button (click)="handleEdit(post, $event)" class="action-btn">
+            <mat-icon style="font-size: 16px; width: 16px; height: 16px;">edit</mat-icon> Edit
+          </button>
+          <button (click)="handleDelete(post.id, $event)" class="action-btn delete">
+            <mat-icon style="font-size: 16px; width: 16px; height: 16px;">delete</mat-icon> Delete
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="myPosts.length === 0" style="text-align: center; padding: 8rem 0; opacity: 0.4;">
+      <p>You haven't written any stories yet.</p>
+    </div>
+
+  </div>
+
+  <app-post-editor *ngIf="showPostEditor"
+    [post]="editingPost"
+    [isLoading]="isLoading"
+    (save)="handleSave($event)"
+    (cancel)="handleCancel()">
+  </app-post-editor>
+</div>

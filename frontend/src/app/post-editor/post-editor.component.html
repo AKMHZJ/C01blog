@@ -1,0 +1,56 @@
+<div class="editor-overlay">
+  <div class="editor-modal" [ngClass]="isDark ? 'theme-dark' : 'theme-light'">
+
+    <div class="editor-header">
+      <h2 class="font-serif text-3xl">{{ post ? 'Edit Post' : 'Create New Post' }}</h2>
+      <button (click)="cancel.emit()" class="icon-btn">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <form (ngSubmit)="handleSubmit()" class="editor-body">
+      <div>
+        <label class="text-xs uppercase opacity-50">Title</label>
+        <input [(ngModel)]="title" name="title" required class="input-field font-serif text-2xl" placeholder="Give it a name...">
+      </div>
+
+      <div>
+        <label class="text-xs uppercase opacity-50">Excerpt</label>
+        <input [(ngModel)]="excerpt" name="excerpt" class="input-field" placeholder="Brief summary...">
+      </div>
+
+      <div class="grid cols-2">
+        <div>
+          <label class="text-xs uppercase opacity-50">Category</label>
+          <select [(ngModel)]="category" name="category" class="input-field">
+            <option>Technology</option>
+            <option>Lifestyle</option>
+            <option>Tech</option>
+            <option>News</option>
+          </select>
+        </div>
+        <div class="upload-zone">
+          <input type="file" (change)="onFileSelected($event)" accept="image/*" class="hidden" #fileInput>
+          <button type="button" (click)="fileInput.click()" class="btn-primary" style="font-size: 0.875rem;">
+            {{ image ? 'Change Image' : 'Upload Header Image' }}
+          </button>
+          <div *ngIf="image" style="margin-top: 1rem;">
+            <img [src]="getFullImageUrl(image)" class="rounded-lg">
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <label class="text-xs uppercase opacity-50">Content</label>
+        <textarea [(ngModel)]="content" name="content" required class="textarea-field" placeholder="Write your story..."></textarea>
+        <p class="text-xs opacity-40 mt-2">Blank lines create separate paragraphs.</p>
+      </div>
+
+      <div class="flex gap-4 pt-4">
+        <button type="submit" [disabled]="isLoading || isUploading" class="btn-primary" style="flex: 1; padding: 1.25rem;">
+          {{ isLoading ? 'Processing...' : (post ? 'Update Post' : 'Publish Post') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

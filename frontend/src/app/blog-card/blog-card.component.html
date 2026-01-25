@@ -1,0 +1,33 @@
+<article (click)="cardClick.emit()" class="blog-card font-sans">
+  <div class="card-header">
+    <img [src]="author?.avatar | imageUrl:'https://placehold.co/32'" class="author-avatar" />
+    <div class="author-info" *ngIf="author">
+      <div class="name">{{ author.displayName || author.username }}</div>
+      <div class="handle">@{{ author.username }}</div>
+    </div>
+  </div>
+
+  <div class="image-container">
+    <img [src]="image | imageUrl:'https://placehold.co/600x400'" [alt]="title" class="card-image" />
+  </div>
+
+  <div class="meta-row">
+    <span class="category-tag">{{ category }}</span>
+    <span class="date-text">{{ date | date }}</span>
+  </div>
+
+  <h2 class="card-title">{{ title }}</h2>
+
+  <div class="card-footer">
+    <div class="stat">
+      <mat-icon style="font-size: 16px; width: 16px; height: 16px;">
+        {{ likeCount > 0 ? 'favorite' : 'favorite_border' }}
+      </mat-icon>
+      <span>{{ likeCount || 0 }}</span>
+    </div>
+    <div class="stat">
+      <mat-icon style="font-size: 16px; width: 16px; height: 16px;">chat_bubble_outline</mat-icon>
+      <span>{{ commentCount || 0 }}</span>
+    </div>
+  </div>
+</article>

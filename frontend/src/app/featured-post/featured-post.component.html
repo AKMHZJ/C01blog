@@ -1,0 +1,38 @@
+<article (click)="postClick.emit()" class="featured-post font-sans">
+  <div class="image-wrapper">
+    <img [src]="image | imageUrl:'https://placehold.co/1200x600'" [alt]="title" class="featured-image" />
+  </div>
+  
+  <div class="featured-content">
+    <div class="meta-info">
+      <div class="author-mini" *ngIf="author">
+        <img [src]="author.avatar | imageUrl:'https://placehold.co/40'" class="mini-avatar" />
+        <div class="author-info">
+          <div style="font-weight: 500;">{{ author.displayName || author.username }}</div>
+          <div style="font-size: 0.75rem; opacity: 0.5;">@{{ author.username }}</div>
+        </div>
+      </div>
+      
+      <div style="margin-left: auto; display: flex; align-items: center; gap: 1rem;">
+        <span class="tag">{{ category }}</span>
+        <time class="date-text">{{ date | date }}</time>
+      </div>
+    </div>
+
+    <h2 class="featured-title">{{ title }}</h2>
+    <p class="excerpt">{{ excerpt }}</p>
+
+    <div class="card-footer" style="margin-top: 2rem; display: flex; gap: 2rem; opacity: 0.6;">
+      <div class="stat" style="display: flex; align-items: center; gap: 0.5rem;">
+        <mat-icon style="font-size: 20px; width: 20px; height: 20px;">
+          {{ likeCount > 0 ? 'favorite' : 'favorite_border' }}
+        </mat-icon>
+        <span>{{ likeCount || 0 }}</span>
+      </div>
+      <div class="stat" style="display: flex; align-items: center; gap: 0.5rem;">
+        <mat-icon style="font-size: 20px; width: 20px; height: 20px;">chat_bubble_outline</mat-icon>
+        <span>{{ commentCount || 0 }}</span>
+      </div>
+    </div>
+  </div>
+</article>

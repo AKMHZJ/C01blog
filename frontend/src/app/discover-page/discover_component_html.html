@@ -1,0 +1,37 @@
+<div class="discover-page font-sans" [ngClass]="isDark ? 'bg-black text-white' : 'bg-white text-black'">
+  <main class="container">
+
+    <header style="margin-bottom: 4rem;">
+      <h1 class="font-serif text-5xl font-light mb-4">Discover Users</h1>
+      <p class="opacity-60 text-lg">Find interesting people to follow and grow your network.</p>
+    </header>
+
+        <div class="users-list">
+          <div *ngFor="let user of users" (click)="onUserClick(user)" class="user-card">
+            <img [src]="user.avatar | imageUrl:'https://placehold.co/80'" [alt]="user.name">
+            
+            <div class="user-body">          <h3 class="font-serif">{{ user.name }}</h3>
+          <p class="opacity-50 text-sm mb-4">
+            @{{ user.username }} · {{ getUserPostCount(user.id) }}
+            {{ getUserPostCount(user.id) === 1 ? 'story' : 'stories' }}
+          </p>
+          <p class="opacity-70 mb-6">{{ user.bio }}</p>
+
+          <button (click)="handleToggleSubscribe(user.id, $event)"
+                  class="sub-btn"
+                  [ngClass]="isSubscribed(user.id) ? 'subscribed' : 'not-subscribed'">
+            <mat-icon style="font-size: 18px; width: 18px; height: 18px;">
+              {{ isSubscribed(user.id) ? 'person_remove' : 'person_add' }}
+            </mat-icon>
+            {{ isSubscribed(user.id) ? 'Subscribed' : 'Subscribe' }}
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="users.length === 0" style="text-align: center; padding: 5rem 0; opacity: 0.4;">
+        <p>No users found.</p>
+      </div>
+    </div>
+
+  </main>
+</div>

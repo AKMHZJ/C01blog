@@ -1,0 +1,50 @@
+<div class="auth-page" [ngClass]="isDark ? 'theme-dark' : 'theme-light'">
+
+  <button (click)="toggleTheme()" class="icon-btn" style="position: fixed; top: 2rem; right: 2rem; opacity: 0.6; font-size: 0.875rem;">
+    {{ isDark ? 'Light' : 'Dark' }}
+  </button>
+
+  <div class="auth-container">
+    <!-- Logo -->
+    <div class="flex justify-center mb-12">
+      <a routerLink="/" class="logo-wrapper" style="text-decoration: none; color: inherit;">
+        <div class="logo-circle">B</div>
+        <span class="logo-text">Blog Network</span>
+      </a>
+    </div>
+
+    <!-- Heading -->
+    <div class="auth-header">
+      <h1>Log in</h1>
+      <p style="font-family: 'Inter', sans-serif; opacity: 0.6;">
+        or <a routerLink="/signup" style="color: inherit; text-decoration: underline; text-underline-offset: 4px; transition: opacity 0.3s; &:hover { opacity: 1; }">create an account</a>
+      </p>
+    </div>
+
+    <!-- Form -->
+    <form [formGroup]="loginForm" (ngSubmit)="handleSubmit()">
+      <div class="form-group">
+        <input formControlName="username" (keydown)="handleKeyPress($event)" placeholder="Email or username" autocomplete="username" />
+      </div>
+
+      <div class="form-group">
+        <input formControlName="password" (keydown)="handleKeyPress($event)" type="password" placeholder="Password" autocomplete="current-password" />
+      </div>
+
+      <button type="submit" class="btn-auth">Enter</button>
+
+      <div class="text-center pt-4">
+        <a href="#" style="font-size: 0.875rem; text-decoration: underline; text-underline-offset: 4px; opacity: 0.6; color: inherit;">Forgot password?</a>
+      </div>
+    </form>
+
+    <p class="demo-notice">
+      This is a demo — use any username and password to continue.
+    </p>
+
+    <div class="footer-links">
+      <a href="#">Terms of Service</a>
+      <a href="#">Privacy Policy</a>
+    </div>
+  </div>
+</div>

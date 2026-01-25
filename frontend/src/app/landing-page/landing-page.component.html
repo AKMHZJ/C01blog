@@ -1,0 +1,225 @@
+<div class="landing-page" [ngClass]="theme.isDark() ? 'theme-dark' : 'theme-light'">
+
+  <nav class="navbar" [ngClass]="{'scrolled': scrollY > 50}">
+    <div class="nav-container">
+      <div class="logo-wrapper" (click)="onContinue()">
+        <div class="logo-circle">B</div>
+        <span class="logo-text">Blog Network</span>
+      </div>
+
+      <div class="nav-actions">
+        <button (click)="toggleTheme()" class="theme-btn" [style.color]="theme.isDark() ? '#fff' : '#000'">
+          {{ theme.isDark() ? 'Light' : 'Dark' }}
+        </button>
+        <button (click)="onContinue()" class="btn-primary">
+          Log In
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero-section">
+    <div class="container hero-content">
+      <p class="welcome-text fade-in">Welcome</p>
+      
+      <h1 class="hero-title fade-in">
+        A discovery engine for
+        <span class="word-transition" [class.animating-out]="animatingOut">
+          {{ words[currentWordIndex] }}
+        </span>
+      </h1>
+
+      <p class="hero-subtitle fade-in">
+        Discover thoughtful writing from designers, technologists, and creatives.
+        Press continue to sign in and explore posts.
+      </p>
+
+      <div class="fade-in action-wrapper">
+        <button (click)="onContinue()" class="btn-primary large">
+          Continue
+        </button>
+      </div>
+
+      <div class="scroll-indicator fade-in">
+        <p class="scroll-text">Scroll to explore</p>
+        <div class="scroll-line"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="about" class="about-section">
+    <div class="container">
+      <div class="grid cols-2 items-center">
+        <div class="reveal-up text-content">
+          <h2 class="section-title">
+            Built for <span class="highlight">Growth</span>
+          </h2>
+          <p class="description">
+            01Blog provides a collaborative space where users can publish posts, interact with content, follow other learners, and engage in meaningful discussions.
+          </p>
+          <p class="description">
+            It's more than a blogging platform — it's a space for students to document progress, exchange knowledge, and grow together through shared learning experiences.
+          </p>
+        </div>
+
+        <div class="reveal-up feature-card glass-card">
+          <div class="card-content">
+            <div class="feature-item">
+              <div class="icon-box">
+                <mat-icon class="icon-blue">dashboard</mat-icon>
+              </div>
+              <div>
+                <h3 class="feature-title">Modern Architecture</h3>
+                <p class="feature-desc">Built as a full-stack web application combining a Java Spring Boot backend with a modern Angular frontend.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="icon-box">
+                <mat-icon class="icon-purple">verified_user</mat-icon>
+              </div>
+              <div>
+                <h3 class="feature-title">Secure & Scalable</h3>
+                <p class="feature-desc">Demonstrates real-world concepts such as RESTful APIs, secure user authentication, and robust data persistence.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="features" class="features-section" [style.background]="theme.isDark() ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)'">
+    <div class="container">
+      <div class="section-header reveal-up">
+        <h2 class="section-title">Key Features</h2>
+        <p class="section-subtitle">Everything you need to document your journey.</p>
+      </div>
+
+      <div class="grid cols-3">
+        <div class="reveal-up feature-card glass-card hover-effect">
+          <div class="icon-circle blue">
+            <mat-icon class="icon-blue">edit</mat-icon>
+          </div>
+          <h3 class="feature-title">Create & Share</h3>
+          <p class="feature-desc">Create, edit, and share rich blog posts about your technical discoveries.</p>
+        </div>
+
+        <div class="reveal-up feature-card glass-card hover-effect">
+          <div class="icon-circle purple">
+            <mat-icon class="icon-purple">forum</mat-icon>
+          </div>
+          <h3 class="feature-title">Interactive Discussions</h3>
+          <p class="feature-desc">Comment and interact with other users' content to foster deep learning.</p>
+        </div>
+
+        <div class="reveal-up feature-card glass-card hover-effect">
+          <div class="icon-circle green">
+            <mat-icon class="icon-green">people</mat-icon>
+          </div>
+          <h3 class="feature-title">Build Your Network</h3>
+          <p class="feature-desc">Follow other learners, build connections, and grow your professional circle.</p>
+        </div>
+
+        <div class="reveal-up feature-card glass-card hover-effect">
+          <div class="icon-circle orange">
+            <mat-icon class="icon-orange">lock</mat-icon>
+          </div>
+          <h3 class="feature-title">Secure Auth</h3>
+          <p class="feature-desc">Secure authentication and user management to keep your data safe.</p>
+        </div>
+
+        <div class="reveal-up feature-card glass-card hover-effect">
+          <div class="icon-circle blue-dark">
+            <mat-icon class="icon-blue-dark">smartphone</mat-icon>
+          </div>
+          <h3 class="feature-title">Fully Responsive</h3>
+          <p class="feature-desc">A seamless, user-friendly interface that works perfectly on mobile and desktop.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="tech" class="tech-section">
+    <div class="bg-gradient"></div>
+    <div class="container relative">
+      <div class="section-header reveal-up">
+        <h2 class="section-title">Under the Hood</h2>
+        <p class="section-subtitle">Powered by industry-standard technologies.</p>
+      </div>
+
+      <div class="grid cols-2 gap-large">
+        <div class="reveal-up feature-card glass-card border-left-orange">
+          <div class="card-header-row">
+            <h3 class="card-header-title">Backend</h3>
+            <mat-icon class="icon-orange">storage</mat-icon>
+          </div>
+          <ul class="tech-list">
+            <li><span class="dot orange"></span> Java</li>
+            <li><span class="dot orange"></span> Spring Boot</li>
+            <li><span class="dot orange"></span> REST APIs</li>
+            <li><span class="dot orange"></span> MySQL / PostgreSQL</li>
+          </ul>
+        </div>
+
+        <div class="reveal-up feature-card glass-card border-left-red">
+          <div class="card-header-row">
+            <h3 class="card-header-title">Frontend</h3>
+            <mat-icon class="icon-red">computer</mat-icon>
+          </div>
+          <ul class="tech-list">
+            <li><span class="dot red"></span> Angular</li>
+            <li><span class="dot blue"></span> TypeScript</li>
+            <li><span class="dot yellow"></span> HTML5 / CSS3</li>
+            <li><span class="dot pink"></span> Responsive Design</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="noise-section">
+    <div class="container text-center">
+      <div class="reveal-up">
+        <h2 class="noise-title">
+          Zero noise, notifications, or distractions
+        </h2>
+        <p class="noise-subtitle">
+          No likes, comments, or ego. Just pure, harmonious expression.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <div class="container text-center">
+      <div class="reveal-up">
+        <h2 class="cta-title">
+          We welcome you to join us
+        </h2>
+        <p class="cta-subtitle">
+          Start your journey
+        </p>
+        <button (click)="onSignUp()" class="btn-primary large">
+          Sign Up
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="logo-wrapper">
+        <div class="logo-circle small">B</div>
+        <span class="logo-text">Blog Network</span>
+      </div>
+      
+      <div class="footer-links">
+        <a href="#">Manifesto</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms</a>
+      </div>
+
+      <div class="copyright">© 2024 Blog Network</div>
+    </div>
+  </footer>
+</div>
