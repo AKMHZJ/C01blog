@@ -2,10 +2,10 @@
 
   <nav class="navbar" [ngClass]="{'scrolled': scrollY > 50}">
     <div class="nav-container">
-      <div class="logo-wrapper" (click)="onContinue()">
+      <a routerLink="/" class="logo-wrapper" style="text-decoration: none; color: inherit;">
         <div class="logo-circle">B</div>
         <span class="logo-text">Blog Network</span>
-      </div>
+      </a>
 
       <div class="nav-actions">
         <button (click)="toggleTheme()" class="theme-btn" [style.color]="theme.isDark() ? '#fff' : '#000'">

@@ -36,7 +36,19 @@ public class AdminController {
         return adminService.listUsers();
     }
 
+    @GetMapping("/posts")
+    public List<Map<String, Object>> posts() {
+        return adminService.listPosts();
+    }
+
+    @DeleteMapping("/posts/{id}")
+    public ResponseEntity<?> deletePost(@PathVariable("id") String postId) {
+        adminService.deletePost(postId);
+        return ResponseEntity.ok(Map.of("deleted", true));
+    }
+
     public record RoleUpdateRequest(String role) {}
+    public record BanRequest(boolean banned) {}
 
     @PutMapping("/users/{id}/role")
     public ResponseEntity<?> updateRole(
@@ -62,6 +74,25 @@ public class AdminController {
         return ResponseEntity.ok(Map.of(
                 "id", String.valueOf(updated.getId()),
                 "role", updated.getRole().name()
+        ));
+    }
+
+    @PutMapping("/users/{id}/ban")
+    public ResponseEntity<?> banUser(
+            @PathVariable("id") Long userId,
+            @RequestBody BanRequest req,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        if (userDetails != null) {
+            User current = userRepository.findByUsername(userDetails.getUsername()).orElse(null);
+            if (current != null && current.getId().equals(userId)) {
+                return ResponseEntity.badRequest().body("You cannot ban yourself");
+            }
+        }
+        User updated = adminService.banUser(userId, req.banned());
+        return ResponseEntity.ok(Map.of(
+                "id", String.valueOf(updated.getId()),
+                "banned", updated.isBanned()
         ));
     }
 

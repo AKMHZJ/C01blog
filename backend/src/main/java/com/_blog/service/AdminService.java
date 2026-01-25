@@ -15,4 +15,10 @@ public interface AdminService {
     User updateRole(Long userId, Role role);
 
     void deleteUser(Long userId);
+
+    User banUser(Long userId, boolean banned);
+
+    List<Map<String, Object>> listPosts();
+
+    void deletePost(String postId);
 }

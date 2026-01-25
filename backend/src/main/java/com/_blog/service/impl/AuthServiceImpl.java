@@ -62,6 +62,10 @@ public class AuthServiceImpl implements AuthService {
         }
         User user = userOpt.orElseThrow(() -> new Exception("Invalid credentials"));
 
+        if (user.isBanned()) {
+            throw new Exception("Your account has been banned");
+        }
+
         boolean match = encoder.matches(rawPassword, user.getPassword());
         if (!match) {
             throw new Exception("Invalid credentials");

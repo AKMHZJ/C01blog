@@ -29,6 +29,9 @@ public class User {
     @Column(nullable = false)
     private Role role = Role.USER;
 
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean banned = false;
+
     public User() {}
 
     public User(Long id, String email, String username, String password, String displayName, String bio, String avatar, Role role) {
@@ -40,6 +43,7 @@ public class User {
         this.bio = bio != null ? bio : "";
         this.avatar = avatar != null ? avatar : "";
         this.role = role != null ? role : Role.USER;
+        this.banned = false;
     }
 
     public Long getId() { return id; }
@@ -65,4 +69,7 @@ public class User {
 
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
+
+    public boolean isBanned() { return banned; }
+    public void setBanned(boolean banned) { this.banned = banned; }
 }

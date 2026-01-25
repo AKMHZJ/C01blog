@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com._blog.entity.Post;
 import com._blog.entity.Role;
 import com._blog.entity.User;
 import com._blog.repository.CommentRepository;
@@ -24,7 +26,8 @@ public class AdminServiceImpl implements AdminService {
     private final CommentRepository commentRepository;
     private final FollowRepository followRepository;
 
-    public AdminServiceImpl(UserRepository userRepository, PostRepository postRepository, CommentRepository commentRepository, FollowRepository followRepository) {
+    public AdminServiceImpl(UserRepository userRepository, PostRepository postRepository, 
+                           CommentRepository commentRepository, FollowRepository followRepository) {
         this.userRepository = userRepository;
         this.postRepository = postRepository;
         this.commentRepository = commentRepository;
@@ -56,6 +59,7 @@ public class AdminServiceImpl implements AdminService {
             entry.put("bio", u.getBio());
             entry.put("avatar", u.getAvatar());
             entry.put("role", u.getRole() != null ? u.getRole().name() : "USER");
+            entry.put("banned", u.isBanned());
 
             entry.put("postCount", postRepository.countByAuthorId(u.getId()));
             entry.put("followers", followRepository.findByFolloweeId(u.getId()).size());
@@ -67,6 +71,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional
     public User updateRole(Long userId, Role role) {
         User u = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         u.setRole(role);
@@ -74,11 +79,42 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional
     public void deleteUser(Long userId) {
         postRepository.deleteByAuthorId(userId);
         commentRepository.deleteByAuthorId(userId);
         followRepository.deleteByFollowerId(userId);
         followRepository.deleteByFolloweeId(userId);
         userRepository.deleteById(userId);
+    }
+
+    @Override
+    @Transactional
+    public User banUser(Long userId, boolean banned) {
+        User u = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        u.setBanned(banned);
+        return userRepository.save(u);
+    }
+
+    @Override
+    public List<Map<String, Object>> listPosts() {
+        List<Post> posts = postRepository.findAllByOrderByDateDesc();
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Post p : posts) {
+            Map<String, Object> entry = new HashMap<>();
+            entry.put("id", p.getId());
+            entry.put("title", p.getTitle());
+            entry.put("author", p.getAuthor() != null ? p.getAuthor().getUsername() : "Unknown");
+            entry.put("date", p.getDate());
+            entry.put("category", p.getCategory());
+            result.add(entry);
+        }
+        return result;
+    }
+
+    @Override
+    @Transactional
+    public void deletePost(String postId) {
+        postRepository.deleteById(postId);
     }
 }

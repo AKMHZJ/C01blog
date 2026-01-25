@@ -4,7 +4,7 @@
     <header class="flex justify-between items-end">
       <div>
         <h1 class="font-serif text-5xl font-light">Admin Dashboard</h1>
-        <p class="opacity-60 mt-2">Manage users and platform statistics.</p>
+        <p class="opacity-60 mt-2">Manage users, posts, and platform statistics.</p>
       </div>
       <button (click)="refresh()" class="btn-primary">Refresh Data</button>
     </header>
@@ -12,9 +12,16 @@
     <div class="flex gap-4 mt-12">
       <button (click)="setTab('overview')" class="tab-btn" [class.active]="activeTab === 'overview'">Overview</button>
       <button (click)="setTab('users')" class="tab-btn" [class.active]="activeTab === 'users'">Users</button>
+      <button (click)="setTab('posts')" class="tab-btn" [class.active]="activeTab === 'posts'">Posts</button>
     </div>
 
     <div *ngIf="loading" style="padding: 5rem 0; text-align: center; opacity: 0.5;">Loading details...</div>
+
+    <!-- Error Alert -->
+    <div *ngIf="error" class="error-alert">
+      {{ error }}
+      <button (click)="error = ''">×</button>
+    </div>
 
     <!-- Overview -->
     <div class="stats-grid" *ngIf="!loading && activeTab === 'overview'">
@@ -46,10 +53,10 @@
         <div>User</div>
         <div>Email</div>
         <div>Role</div>
-        <div>Stories</div>
+        <div>Status</div>
         <div style="text-align: right;">Actions</div>
       </div>
-      <div *ngFor="let u of users" class="table-row">
+      <div *ngFor="let u of users" class="table-row" [class.banned-row]="u.banned">
         <div>
           <div style="font-weight: 500;">{{ u.displayName || u.username }}</div>
           <div style="font-size: 0.75rem; opacity: 0.5;">@{{ u.username }}</div>
@@ -62,10 +69,42 @@
             <option value="ADMIN">ADMIN</option>
           </select>
         </div>
-        <div style="opacity: 0.7;">{{ u.postCount ?? 0 }}</div>
-        <div style="text-align: right;">
+        <div>
+          <span [class]="u.banned ? 'badge banned' : 'badge active'">
+            {{ u.banned ? 'Banned' : 'Active' }}
+          </span>
+        </div>
+        <div style="text-align: right;" class="flex justify-end gap-4">
+          <button (click)="toggleBan(u)" [style.color]="u.banned ? '#10b981' : '#f59e0b'" style="border: none; background: none; cursor: pointer;">
+            {{ u.banned ? 'Unban' : 'Ban' }}
+          </button>
           <button (click)="deleteUser(u)" style="color: #ef4444; border: none; background: none; cursor: pointer;">Delete</button>
         </div>
+      </div>
+    </div>
+
+    <!-- Posts Table -->
+    <div class="table-container font-sans" *ngIf="!loading && activeTab === 'posts'">
+      <div class="table-header">
+        <div>Title</div>
+        <div>Author</div>
+        <div>Category</div>
+        <div>Date</div>
+        <div style="text-align: right;">Actions</div>
+      </div>
+      <div *ngFor="let p of posts" class="table-row">
+        <div style="font-weight: 500;">{{ p.title }}</div>
+        <div style="opacity: 0.7;">@{{ p.author }}</div>
+        <div>
+          <span class="badge category">{{ p.category }}</span>
+        </div>
+        <div style="opacity: 0.5; font-size: 0.875rem;">{{ p.date | date:'short' }}</div>
+        <div style="text-align: right;">
+          <button (click)="deletePost(p)" style="color: #ef4444; border: none; background: none; cursor: pointer;">Delete</button>
+        </div>
+      </div>
+      <div *ngIf="posts.length === 0" style="padding: 3rem; text-align: center; opacity: 0.4;">
+        No posts found on the platform.
       </div>
     </div>
 

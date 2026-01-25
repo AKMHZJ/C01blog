@@ -29,6 +29,7 @@ public class CustomUserDetailsServiceImpl implements UserDetailsService {
         return org.springframework.security.core.userdetails.User.withUsername(user.getUsername())
                 .password(user.getPassword())
                 .authorities(new SimpleGrantedAuthority(authority))
+                .accountLocked(user.isBanned())
                 .build();
     }
 }
