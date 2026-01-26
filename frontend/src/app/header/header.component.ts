@@ -30,6 +30,19 @@ export class HeaderComponent {
 
   constructor() {}
 
+  onLogoClick(event: Event) {
+    event.preventDefault();
+    if (this.user) {
+      if (this.router.url === '/feed') {
+        window.location.reload();
+      } else {
+        this.router.navigate(['/feed']);
+      }
+    } else {
+      this.router.navigate(['/']);
+    }
+  }
+
   logout() {
     this.authService.logout();
   }

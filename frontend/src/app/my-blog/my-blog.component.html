@@ -66,6 +66,7 @@
     <div class="posts-grid">
       <div *ngFor="let post of myPosts" class="card-wrapper">
         <app-blog-card 
+          [id]="post.id"
           [title]="post.title"
           [date]="post.date | date"
           [image]="post.image"

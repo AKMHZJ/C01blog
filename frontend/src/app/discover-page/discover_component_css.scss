@@ -13,13 +13,6 @@
   margin-bottom: 1.5rem;
   cursor: pointer;
   transition: all 0.3s;
-  background: rgba(255, 255, 255, 0.02);
-  
-  &:hover { 
-    background: rgba(255, 255, 255, 0.05); 
-    border-color: #06b6d4;
-    transform: translateX(10px);
-  }
   
   img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(128,128,128,0.2); }
 }
@@ -39,7 +32,55 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s;
-  
-  &.subscribed { background: transparent; border: 1px solid rgba(128, 128, 128, 0.3); color: #fff; }
-  &.not-subscribed { background: #fff; border: none; color: #000; &:hover { background: #e5e5e5; } }
+  border: 1px solid transparent;
+}
+
+/* Dark Mode Styles */
+.discover-page.bg-black {
+  .user-card {
+    background: rgba(255, 255, 255, 0.02);
+    &:hover { 
+      background: rgba(255, 255, 255, 0.05); 
+      border-color: #06b6d4;
+      transform: translateX(10px);
+    }
+  }
+
+  .sub-btn {
+    &.subscribed {
+      background: transparent;
+      border-color: rgba(255,255,255,0.3);
+      color: #fff;
+    }
+    &.not-subscribed {
+      background: #fff;
+      color: #000;
+      &:hover { background: #e5e5e5; }
+    }
+  }
+}
+
+/* Light Mode Styles */
+.discover-page.bg-white {
+  .user-card {
+    background: rgba(0, 0, 0, 0.02);
+    &:hover { 
+      background: rgba(0, 0, 0, 0.05); 
+      border-color: #06b6d4;
+      transform: translateX(10px);
+    }
+  }
+
+  .sub-btn {
+    &.subscribed {
+      background: transparent;
+      border-color: rgba(0,0,0,0.2);
+      color: #000; /* Explicitly black text for light mode subscribed state */
+    }
+    &.not-subscribed {
+      background: #000;
+      color: #fff;
+      &:hover { background: #333; }
+    }
+  }
 }

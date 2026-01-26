@@ -9,9 +9,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import com._blog.entity.Role;
+import com._blog.entity.ReportStatus;
 import com._blog.entity.User;
 import com._blog.repository.UserRepository;
 import com._blog.service.AdminService;
+import com._blog.service.ReportService;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -19,10 +21,12 @@ import com._blog.service.AdminService;
 public class AdminController {
 
     private final AdminService adminService;
+    private final ReportService reportService;
     private final UserRepository userRepository;
 
-    public AdminController(AdminService adminService, UserRepository userRepository) {
+    public AdminController(AdminService adminService, ReportService reportService, UserRepository userRepository) {
         this.adminService = adminService;
+        this.reportService = reportService;
         this.userRepository = userRepository;
     }
 
@@ -40,6 +44,11 @@ public class AdminController {
     public List<Map<String, Object>> posts() {
         return adminService.listPosts();
     }
+    
+    @GetMapping("/reports")
+    public List<Map<String, Object>> reports() {
+        return reportService.getAllReports();
+    }
 
     @DeleteMapping("/posts/{id}")
     public ResponseEntity<?> deletePost(@PathVariable("id") String postId) {
@@ -49,6 +58,21 @@ public class AdminController {
 
     public record RoleUpdateRequest(String role) {}
     public record BanRequest(boolean banned) {}
+    public record ReportStatusRequest(String status) {}
+
+    @PutMapping("/reports/{id}/status")
+    public ResponseEntity<?> updateReportStatus(
+            @PathVariable("id") Long reportId,
+            @RequestBody ReportStatusRequest req
+    ) {
+        try {
+            ReportStatus status = ReportStatus.valueOf(req.status().toUpperCase());
+            reportService.updateReportStatus(reportId, status);
+            return ResponseEntity.ok(Map.of("updated", true));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("Invalid status");
+        }
+    }
 
     @PutMapping("/users/{id}/role")
     public ResponseEntity<?> updateRole(

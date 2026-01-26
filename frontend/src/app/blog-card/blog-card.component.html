@@ -29,5 +29,9 @@
       <mat-icon style="font-size: 16px; width: 16px; height: 16px;">chat_bubble_outline</mat-icon>
       <span>{{ commentCount || 0 }}</span>
     </div>
+    <div style="flex: 1;"></div>
+    <button (click)="openReport($event)" style="border: none; background: none; cursor: pointer; opacity: 0.5;" title="Report">
+      <mat-icon style="font-size: 16px; width: 16px; height: 16px;">flag</mat-icon>
+    </button>
   </div>
 </article>

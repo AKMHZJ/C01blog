@@ -7,12 +7,14 @@ import { AuthService } from '../services/auth.service';
 import { ThemeService } from '../services/theme.service';
 import { Post, Comment } from '../models/post';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ImageUrlPipe } from '../pipes/image-url.pipe';
+import { ReportDialogComponent } from '../report-dialog/report-dialog.component';
 
 @Component({
   selector: 'app-post-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, ImageUrlPipe],
+  imports: [CommonModule, FormsModule, MatIconModule, MatDialogModule, ImageUrlPipe],
   templateUrl: './post-page.component.html',
   styleUrls: ['./post-page.component.scss']
 })
@@ -31,6 +33,7 @@ export class PostPageComponent implements OnInit {
   private postService = inject(PostService);
   public theme = inject(ThemeService);
   private cdr = inject(ChangeDetectorRef);
+  private dialog = inject(MatDialog);
 
   get currentUser() {
     return this.authService.currentUser();
@@ -68,6 +71,18 @@ export class PostPageComponent implements OnInit {
         this.checkInteractionStates();
         this.cdr.detectChanges();
       }, 0);
+    });
+  }
+
+  openReport(): void {
+    if (!this.post) return;
+    this.dialog.open(ReportDialogComponent, {
+      data: { 
+        postId: this.post.id, 
+        postTitle: this.post.title,
+        postAuthor: this.post.author?.username || 'Unknown'
+      },
+      width: '500px'
     });
   }
 

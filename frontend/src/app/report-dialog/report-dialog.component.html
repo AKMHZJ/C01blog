@@ -1,0 +1,77 @@
+<div class="report-container font-sans">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>Report Post</h2>
+    <div class="report-target" *ngIf="data.postAuthor">
+      <span class="label">Reporting post by:</span>
+      <span class="value">@{{ data.postAuthor }}</span>
+    </div>
+  </div>
+
+  <mat-dialog-content>
+    <!-- Step 1: Form -->
+    <div *ngIf="step === 1" class="step-content">
+      <p class="section-title">Why are you reporting this post? *</p>
+      
+      <mat-radio-group [(ngModel)]="selectedReason" class="reason-group">
+        <mat-radio-button *ngFor="let r of reasons" [value]="r" class="reason-item">
+          {{ r }}
+        </mat-radio-button>
+      </mat-radio-group>
+
+      <p class="section-title mt-4">Please provide additional details *</p>
+      <p class="helper-text">Describe the issue in detail. This helps our moderation team understand the situation better.</p>
+      
+      <div class="textarea-wrapper">
+        <textarea [(ngModel)]="additionalDetails" rows="4" maxlength="500" placeholder="Describe the issue..."></textarea>
+        <div class="char-count">{{ additionalDetails.length }}/500 characters</div>
+      </div>
+
+      <div class="info-note">
+        <mat-icon>info</mat-icon>
+        <p>Reports are reviewed by our moderation team. False reports may result in action against your account. The reported user will not be notified of your report.</p>
+      </div>
+    </div>
+
+    <!-- Step 2: Review/Confirm -->
+    <div *ngIf="step === 2" class="step-content review-step">
+      <div class="review-header">
+        <mat-icon class="warning-icon">gpp_maybe</mat-icon>
+        <h3>Confirm Report</h3>
+      </div>
+      
+      <p class="review-intro">Please review your report details before submitting.</p>
+      
+      <div class="review-details">
+        <div class="review-item">
+          <span class="label">Reason:</span>
+          <span class="value">{{ selectedReason }}</span>
+        </div>
+        <div class="review-item">
+          <span class="label">Details:</span>
+          <span class="value text-block">{{ additionalDetails }}</span>
+        </div>
+      </div>
+
+      <p class="confirmation-text">Are you sure you want to submit this report?</p>
+      
+      <div *ngIf="error" class="error-msg">{{ error }}</div>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="cancel()">Cancel</button>
+    
+    <button *ngIf="step === 1" mat-raised-button color="primary" 
+            (click)="continueToReview()" 
+            [disabled]="!selectedReason || !additionalDetails.trim()">
+      Continue to Review
+    </button>
+    
+    <button *ngIf="step === 2" mat-button (click)="backToEdit()" [disabled]="loading">Back</button>
+    <button *ngIf="step === 2" mat-raised-button color="warn" 
+            (click)="submit()" 
+            [disabled]="loading">
+      {{ loading ? 'Submitting...' : 'Submit Report' }}
+    </button>
+  </mat-dialog-actions>
+</div>

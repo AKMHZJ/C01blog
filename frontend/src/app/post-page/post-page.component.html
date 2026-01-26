@@ -6,13 +6,21 @@
 
     <article class="post-article">
       <header class="post-header">
-        <div class="author-meta">
-          <img [src]="post.author?.avatar | imageUrl:'https://placehold.co/40'" alt="Author">
-          <div>
-            <div style="font-weight: 500;">{{ post.author?.displayName || post.author?.username }}</div>
-            <div style="opacity: 0.5; font-size: 0.875rem;">{{ post.date | date:'longDate' }}</div>
+        <div class="flex justify-between items-start">
+          <div class="author-meta">
+            <img [src]="post.author?.avatar | imageUrl:'https://placehold.co/40'" alt="Author">
+            <div>
+              <div style="font-weight: 500;">{{ post.author?.displayName || post.author?.username }}</div>
+              <div style="opacity: 0.5; font-size: 0.875rem;">{{ post.date | date:'longDate' }}</div>
+            </div>
           </div>
+          
+          <button (click)="openReport()" class="flex items-center gap-2 bg-transparent border-none cursor-pointer" style="color: inherit; opacity: 0.6;" title="Report Post">
+            <mat-icon>flag</mat-icon>
+            <span style="font-size: 0.9rem;">Report</span>
+          </button>
         </div>
+        
         <h1 class="font-serif">{{ post.title }}</h1>
         <p style="font-size: 1.125rem; opacity: 0.7;">{{ post.excerpt }}</p>
       </header>

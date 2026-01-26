@@ -17,6 +17,7 @@
     <!-- Feed Grid -->
     <div class="feed-grid" *ngIf="feedPosts.length > 1 && !showEmptyRequested">
       <app-blog-card *ngFor="let post of feedPosts.slice(1)"
+        [id]="post.id"
         [title]="post.title"
         [date]="post.date | date"
         [image]="post.image"

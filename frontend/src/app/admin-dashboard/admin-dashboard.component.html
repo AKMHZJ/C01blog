@@ -13,6 +13,7 @@
       <button (click)="setTab('overview')" class="tab-btn" [class.active]="activeTab === 'overview'">Overview</button>
       <button (click)="setTab('users')" class="tab-btn" [class.active]="activeTab === 'users'">Users</button>
       <button (click)="setTab('posts')" class="tab-btn" [class.active]="activeTab === 'posts'">Posts</button>
+      <button (click)="setTab('reports')" class="tab-btn" [class.active]="activeTab === 'reports'">Reports</button>
     </div>
 
     <div *ngIf="loading" style="padding: 5rem 0; text-align: center; opacity: 0.5;">Loading details...</div>
@@ -105,6 +106,45 @@
       </div>
       <div *ngIf="posts.length === 0" style="padding: 3rem; text-align: center; opacity: 0.4;">
         No posts found on the platform.
+      </div>
+    </div>
+
+    <!-- Reports Table -->
+    <div class="table-container font-sans" *ngIf="!loading && activeTab === 'reports'">
+      <div class="table-header">
+        <div>Reporter</div>
+        <div>Reported Post</div>
+        <div>Reason</div>
+        <div>Status</div>
+        <div style="text-align: right;">Actions</div>
+      </div>
+      <div *ngFor="let r of reports" class="table-row">
+        <div>
+          <div style="font-weight: 500;">{{ r.reporterName }}</div>
+        </div>
+        <div>
+          <div style="font-weight: 500;">{{ r.postTitle || 'Unknown Post' }}</div>
+          <div style="font-size: 0.75rem; opacity: 0.5;">by @{{ r.postAuthorName }}</div>
+        </div>
+        <div style="opacity: 0.7; font-style: italic;">"{{ r.reason }}"</div>
+        <div>
+          <span class="badge" [ngClass]="{'active': r.status === 'PENDING', 'banned': r.status === 'DISMISSED'}">
+            {{ r.status }}
+          </span>
+        </div>
+        <div style="text-align: right;" class="flex justify-end gap-2">
+          <button *ngIf="r.status === 'PENDING'" (click)="resolveReport(r, 'RESOLVED')" style="color: #10b981; border: none; background: none; cursor: pointer;">Resolve</button>
+          <button *ngIf="r.status === 'PENDING'" (click)="resolveReport(r, 'DISMISSED')" style="color: #9ca3af; border: none; background: none; cursor: pointer;">Dismiss</button>
+          <button (click)="deletePostById(r.postId)" style="color: #ef4444; border: none; background: none; cursor: pointer;" title="Delete Post">
+            <mat-icon style="font-size: 18px;">delete</mat-icon>
+          </button>
+          <button (click)="banUserById(r.postAuthorId)" style="color: #f59e0b; border: none; background: none; cursor: pointer;" title="Ban User">
+             <mat-icon style="font-size: 18px;">block</mat-icon>
+          </button>
+        </div>
+      </div>
+      <div *ngIf="reports.length === 0" style="padding: 3rem; text-align: center; opacity: 0.4;">
+        No reports found.
       </div>
     </div>
 
