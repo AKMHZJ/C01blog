@@ -25,13 +25,16 @@ public class PostServiceImpl implements PostService {
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
     private final CommentRepository commentRepository;
+    private final com._blog.service.NotificationService notificationService;
 
     public PostServiceImpl(PostRepository postRepository, UserRepository userRepository, 
-                           FollowRepository followRepository, CommentRepository commentRepository) {
+                           FollowRepository followRepository, CommentRepository commentRepository,
+                           com._blog.service.NotificationService notificationService) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.followRepository = followRepository;
         this.commentRepository = commentRepository;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -88,10 +91,13 @@ public class PostServiceImpl implements PostService {
         post.setCategory(request.category());
         post.setImage(request.image());
         post.setDate(LocalDateTime.now());
-        post.setAuthor(author);
         post.setContentList(request.content());
 
-        return postRepository.save(post);
+        Post savedPost = postRepository.save(post);
+        
+        notificationService.notifyFollowers(author, "NEW_POST", "posted a new story: " + savedPost.getTitle(), savedPost.getId());
+        
+        return savedPost;
     }
 
     @Override

@@ -152,6 +152,34 @@
   padding-bottom: 2rem;
   border-bottom: 1px solid rgba(128, 128, 128, 0.1);
   
+  /* Responsive changes for widths below 1023px */
+  @media (max-width: 1023px) {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 2rem;
+    
+    .user-meta {
+      flex-direction: column;
+      gap: 1.5rem;
+      
+      h1 {
+        font-size: 2.5rem; /* Smaller font on mobile */
+      }
+      
+      .user-stats {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 0.25rem 0.5rem;
+      }
+    }
+    
+    .header-actions {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+  
   .user-meta {
     display: flex;
     align-items: center;

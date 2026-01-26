@@ -9,4 +9,6 @@ public interface AuthService {
     User registerUser(User user) throws Exception;
 
     Map<String, Object> login(String identifier, String rawPassword) throws Exception;
+
+    User getCurrentUser();
 }

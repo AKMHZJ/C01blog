@@ -9,6 +9,9 @@ import com._blog.entity.User;
 import com._blog.repository.UserRepository;
 import com._blog.utils.JwtTokenProvider;
 
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -24,6 +27,19 @@ public class AuthServiceImpl implements AuthService {
         this.userRepository = userRepository;
         this.encoder = encoder;
         this.tokenProvider = tokenProvider;
+    }
+
+    @Override
+    public User getCurrentUser() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username;
+        if (principal instanceof UserDetails) {
+            username = ((UserDetails) principal).getUsername();
+        } else {
+            username = principal.toString();
+        }
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Current user not found"));
     }
 
     @Override
