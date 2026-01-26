@@ -51,6 +51,21 @@
 .table-container {
   margin-top: 4rem;
   width: 100%;
+  overflow-x: auto;
+  border: 1px solid rgba(128, 128, 128, 0.1);
+  border-radius: 1rem;
+  
+  /* Custom Scrollbar Styling */
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(128, 128, 128, 0.2);
+    border-radius: 4px;
+  }
 }
 
 .table-header {
@@ -62,11 +77,7 @@
   text-transform: uppercase;
   letter-spacing: 0.1em;
   opacity: 0.5;
-  
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr 1fr;
-    div:nth-child(2), div:nth-child(3), div:nth-child(4) { display: none; }
-  }
+  min-width: 900px; /* Force minimum width to trigger scroll */
 }
 
 .table-row {
@@ -76,14 +87,10 @@
   border-bottom: 1px solid rgba(128, 128, 128, 0.1);
   align-items: center;
   transition: background 0.2s;
+  min-width: 900px; /* Force minimum width to trigger scroll */
   
   &:hover {
     background: rgba(128, 128, 128, 0.02);
-  }
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr 1fr;
-    div:nth-child(2), div:nth-child(3), div:nth-child(4) { display: none; }
   }
 }
 
