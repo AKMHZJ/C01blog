@@ -1,37 +1,42 @@
 <article (click)="cardClick.emit()" class="blog-card font-sans">
-  <div class="card-header">
-    <img [src]="author?.avatar | imageUrl:'https://placehold.co/32'" class="author-avatar" />
-    <div class="author-info" *ngIf="author">
-      <div class="name">{{ author.displayName || author.username }}</div>
-      <div class="handle">@{{ author.username }}</div>
-    </div>
-  </div>
-
+  
+  <!-- 1. Thumbnail Image (4:3, sharp) -->
   <div class="image-container">
     <img [src]="image | imageUrl:'https://placehold.co/600x400'" [alt]="title" class="card-image" />
   </div>
 
+  <!-- 2. Meta Row (Badge + Date) -->
   <div class="meta-row">
-    <span class="category-tag">{{ category }}</span>
+    <span class="category-badge">{{ category }}</span>
     <span class="date-text">{{ date | date }}</span>
   </div>
 
-  <h2 class="card-title">{{ title }}</h2>
+  <!-- 3. Title -->
+  <h3 class="card-title">{{ title }}</h3>
 
-  <div class="card-footer">
-    <div class="stat">
-      <mat-icon style="font-size: 16px; width: 16px; height: 16px;">
-        {{ likeCount > 0 ? 'favorite' : 'favorite_border' }}
-      </mat-icon>
-      <span>{{ likeCount || 0 }}</span>
+  <!-- Stats Row (Likes and Comments) -->
+  <div class="stats-row" *ngIf="likeCount > 0 || commentCount > 0">
+    <div class="stat-item" *ngIf="likeCount > 0">
+      <mat-icon style="font-size: 14px; width: 14px; height: 14px; color: #ef4444;">favorite</mat-icon>
+      <span>{{ likeCount }}</span>
     </div>
-    <div class="stat">
-      <mat-icon style="font-size: 16px; width: 16px; height: 16px;">chat_bubble_outline</mat-icon>
-      <span>{{ commentCount || 0 }}</span>
+    <div class="stat-item" *ngIf="commentCount > 0">
+      <mat-icon style="font-size: 14px; width: 14px; height: 14px;">chat_bubble_outline</mat-icon>
+      <span>{{ commentCount }}</span>
     </div>
-    <div style="flex: 1;"></div>
-    <button (click)="openReport($event)" style="border: none; background: none; cursor: pointer; opacity: 0.5;" title="Report">
+  </div>
+
+  <!-- 4. Author Row -->
+  <div class="author-row">
+    <img [src]="author?.avatar | imageUrl:'https://placehold.co/32'" class="author-avatar" />
+    <span class="author-name">{{ author?.displayName || author?.username }}</span>
+    
+    <div class="spacer"></div>
+    
+    <!-- Keeping report button accessible but subtle/hidden until hover maybe? Or just aligned right as utility -->
+    <button (click)="openReport($event)" class="report-btn" title="Report">
       <mat-icon style="font-size: 16px; width: 16px; height: 16px;">flag</mat-icon>
     </button>
   </div>
+
 </article>

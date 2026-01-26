@@ -3,6 +3,7 @@ import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './header/header.component';
 import { CommonModule } from '@angular/common';
 import { AuthService } from './services/auth.service';
+import { ThemeService } from './services/theme.service';
 import { Observable, combineLatest } from 'rxjs';
 import { filter, map, startWith } from 'rxjs/operators';
 import { toObservable } from '@angular/core/rxjs-interop';
@@ -18,6 +19,7 @@ export class AppComponent {
   showHeader$: Observable<boolean>;
   private authService = inject(AuthService);
   private router = inject(Router);
+  public theme = inject(ThemeService);
 
   constructor(private cdr: ChangeDetectorRef) {
     const hiddenRoutes = ['/login', '/signup', '/'];
@@ -33,4 +35,7 @@ export class AppComponent {
     );
   }
 
+  get isDark() {
+    return this.theme.isDark();
+  }
 }

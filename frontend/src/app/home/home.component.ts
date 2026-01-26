@@ -1,22 +1,20 @@
-import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
-import { PostService } from '../services/post.service';
-import { Post } from '../models/post';
-import { FeaturedPostComponent } from '../featured-post/featured-post.component';
-import { BlogCardComponent } from '../blog-card/blog-card.component';
-import { AuthService } from '../services/auth.service';
-import { UserService } from '../services/user.service';
-import { ThemeService } from '../services/theme.service';
-import { toObservable } from '@angular/core/rxjs-interop';
 import { combineLatest } from 'rxjs';
+import { BlogCardComponent } from '../blog-card/blog-card.component';
+import { PostService } from '../services/post.service';
+import { AuthService } from '../services/auth.service';
+import { ThemeService } from '../services/theme.service';
+import { Post } from '../models/post';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FeaturedPostComponent, BlogCardComponent],
+  imports: [CommonModule, BlogCardComponent],
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss'],
+  styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit {
   feedPosts: Post[] = [];

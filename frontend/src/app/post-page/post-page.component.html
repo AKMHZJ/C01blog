@@ -1,94 +1,108 @@
-<div class="post-page font-sans" *ngIf="post" [ngClass]="isDark ? 'theme-dark' : 'theme-light'">
+<div class="post-page" *ngIf="post" [ngClass]="isDark ? 'theme-dark' : 'theme-light'">
   <div class="container">
-    <button (click)="goBack()" class="back-btn">
-      <mat-icon>arrow_back</mat-icon> Back to Feed
-    </button>
+    
+    <!-- 1. Header Area -->
+    <header class="page-header">
+      <button (click)="goBack()" class="back-link">
+        <mat-icon>arrow_back</mat-icon> Back to all posts
+      </button>
 
-    <article class="post-article">
-      <header class="post-header">
-        <div class="flex justify-between items-start">
-          <div class="author-meta">
-            <img [src]="post.author?.avatar | imageUrl:'https://placehold.co/40'" alt="Author">
-            <div>
-              <div style="font-weight: 500;">{{ post.author?.displayName || post.author?.username }}</div>
-              <div style="opacity: 0.5; font-size: 0.875rem;">{{ post.date | date:'longDate' }}</div>
-            </div>
+      <div class="meta-row">
+        <span class="category-badge">{{ post.category }}</span>
+        <span class="date-text">{{ post.date | date:'longDate' }}</span>
+      </div>
+    </header>
+
+    <!-- 2. Author Section -->
+    <div class="author-section">
+      <div class="author-info">
+        <img [src]="post.author?.avatar | imageUrl:'https://placehold.co/40'" alt="Author" class="author-avatar">
+        <div class="author-text">
+          <div class="author-name">{{ post.author?.displayName || post.author?.username }}</div>
+          <div class="author-handle">@{{ post.author?.username }}</div>
+        </div>
+      </div>
+      
+      <button (click)="openReport()" class="report-btn" title="Report Post">
+        <mat-icon>flag</mat-icon>
+        <span>Report</span>
+      </button>
+    </div>
+
+    <h1 class="post-title">{{ post.title }}</h1>
+
+    <!-- 3. Hero Image -->
+    <div class="hero-image-wrapper">
+      <img [src]="post.image | imageUrl:'https://placehold.co/1200x600'" [alt]="post.title" class="hero-image">
+    </div>
+
+    <!-- 4. Action Bar -->
+    <div class="action-bar">
+      <button (click)="handleLike()" class="action-item" [class.active]="isLiked">
+        <mat-icon>{{ isLiked ? 'favorite' : 'favorite_border' }}</mat-icon>
+        <span>{{ post.likes.length || 0 }}</span>
+      </button>
+      <div class="action-item">
+        <mat-icon>chat_bubble_outline</mat-icon>
+        <span>{{ post.comments.length || 0 }}</span>
+      </div>
+    </div>
+
+    <!-- 5. Content -->
+    <div class="post-content">
+      <p *ngFor="let paragraph of post.content">{{ paragraph }}</p>
+    </div>
+
+    <!-- 6. Comments Section -->
+    <section class="comment-section">
+      <h3 class="comments-header">Comments ({{ post.comments.length || 0 }})</h3>
+
+      <div *ngIf="currentUser" class="comment-form-wrapper">
+        <form (ngSubmit)="handleCommentSubmit()">
+          <textarea [(ngModel)]="commentText" name="commentText" rows="3" class="comment-input" placeholder="Write a comment..."></textarea>
+          <div class="form-actions">
+            <button type="submit" class="btn-primary" [disabled]="!commentText.trim()">Post Comment</button>
           </div>
+        </form>
+      </div>
+
+      <div class="comments-list">
+        <div *ngFor="let comment of post.comments" class="comment-card">
+          <img [src]="comment.author?.avatar | imageUrl:'https://placehold.co/40'" alt="Author" class="comment-avatar">
           
-          <button (click)="openReport()" class="flex items-center gap-2 bg-transparent border-none cursor-pointer" style="color: inherit; opacity: 0.6;" title="Report Post">
-            <mat-icon>flag</mat-icon>
-            <span style="font-size: 0.9rem;">Report</span>
-          </button>
-        </div>
-        
-        <h1 class="font-serif">{{ post.title }}</h1>
-        <p style="font-size: 1.125rem; opacity: 0.7;">{{ post.excerpt }}</p>
-      </header>
-
-      <img [src]="post.image | imageUrl:'https://placehold.co/1200x600'" [alt]="post.title" class="post-hero-image">
-
-      <div class="post-content">
-        <p *ngFor="let paragraph of post.content">{{ paragraph }}</p>
-      </div>
-
-      <div class="flex items-center gap-6 py-4" style="border-top: 1px solid rgba(128,128,128,0.2); border-bottom: 1px solid rgba(128,128,128,0.2);">
-        <button (click)="handleLike()" class="flex items-center gap-2 bg-transparent border-none cursor-pointer" style="color: inherit;">
-          <mat-icon [style.color]="isLiked ? '#ef4444' : 'inherit'">{{ isLiked ? 'favorite' : 'favorite_border' }}</mat-icon>
-          <span>{{ post.likes.length || 0 }}</span>
-        </button>
-      </div>
-
-      <section class="comment-section">
-        <h2 class="font-serif text-2xl mb-6">Comments ({{ post.comments.length || 0 }})</h2>
-
-        <div *ngIf="currentUser" style="margin-bottom: 2rem;">
-          <form (ngSubmit)="handleCommentSubmit()">
-            <textarea [(ngModel)]="commentText" name="commentText" rows="3" class="comment-input" placeholder="Write a comment..."></textarea>
-            <div style="text-align: right;">
-              <button type="submit" class="btn-primary" [disabled]="!commentText.trim()">Post Comment</button>
-            </div>
-          </form>
-        </div>
-
-        <div class="space-y-8">
-          <div *ngFor="let comment of post.comments" class="comment-card">
-            <img [src]="comment.author?.avatar | imageUrl:'https://placehold.co/40'" alt="Author" class="comment-avatar">
-            
-            <div class="comment-content-wrapper">
-              <div class="comment-header">
-                <div class="author-info">
-                  <span class="author-name">{{ comment.author?.displayName || comment.author?.username }}</span>
-                  <span class="comment-date">{{ formatTimestamp(comment.timestamp) }}</span>
-                </div>
-                
-                <div class="comment-actions" *ngIf="isOwnComment(comment) && editingCommentId !== comment.id">
-                  <button (click)="startEdit(comment)" class="text-btn edit">
-                    <mat-icon>edit</mat-icon> Edit
-                  </button>
-                  <button (click)="handleDeleteComment(comment.id)" class="text-btn delete">
-                    <mat-icon>delete</mat-icon> Delete
-                  </button>
-                </div>
+          <div class="comment-body">
+            <div class="comment-header">
+              <div class="comment-meta">
+                <span class="author-name">{{ comment.author?.displayName || comment.author?.username }}</span>
+                <span class="comment-date">{{ formatTimestamp(comment.timestamp) }}</span>
               </div>
               
-              @if (editingCommentId && editingCommentId === comment.id) {
-                <div class="edit-comment-box">
-                  <textarea [(ngModel)]="editText" class="comment-input" rows="3" placeholder="Update your comment..."></textarea>
-                  <div class="flex gap-3 justify-end mt-2">
-                    <button (click)="cancelEdit()" class="action-btn small">Cancel</button>
-                    <button (click)="saveEdit(comment.id)" class="btn-primary small" [disabled]="!editText.trim()">Save Changes</button>
-                  </div>
-                </div>
-              } @else {
-                <div class="comment-text">
-                  {{ comment.text }}
-                </div>
-              }
+              <div class="comment-actions" *ngIf="isOwnComment(comment) && editingCommentId !== comment.id">
+                <button (click)="startEdit(comment)" class="icon-action">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button (click)="handleDeleteComment(comment.id)" class="icon-action delete">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
             </div>
+            
+            @if (editingCommentId && editingCommentId === comment.id) {
+              <div class="edit-box">
+                <textarea [(ngModel)]="editText" class="edit-input" rows="3"></textarea>
+                <div class="edit-actions">
+                  <button (click)="cancelEdit()" class="btn-text">Cancel</button>
+                  <button (click)="saveEdit(comment.id)" class="btn-primary small">Save</button>
+                </div>
+              </div>
+            } @else {
+              <p class="comment-text">{{ comment.text }}</p>
+            }
           </div>
-          <p *ngIf="!post.comments.length" style="opacity: 0.4; text-align: center; padding: 2rem 0;">No comments yet.</p>
         </div>
-      </section>
-    </article>
+        <p *ngIf="!post.comments.length" class="no-comments">No comments yet. Be the first to share your thoughts!</p>
+      </div>
+    </section>
+
   </div>
 </div>

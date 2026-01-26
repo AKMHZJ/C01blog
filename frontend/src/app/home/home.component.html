@@ -1,22 +1,11 @@
 <div class="home-container" [ngClass]="isDark ? 'theme-dark' : 'theme-light'">
   <main class="container">
 
-    <!-- Featured Post -->
-    <app-featured-post *ngIf="feedPosts.length > 0 && !showEmptyRequested"
-      [title]="feedPosts[0].title"
-      [excerpt]="feedPosts[0].excerpt"
-      [date]="feedPosts[0].date | date"
-      [image]="feedPosts[0].image"
-      [category]="feedPosts[0].category"
-      [author]="feedPosts[0].author"
-      [likeCount]="feedPosts[0].likes.length"
-      [commentCount]="feedPosts[0].comments.length"
-      (postClick)="onPostClick(feedPosts[0].id)">
-    </app-featured-post>
+    <h1 class="page-title">Your Feed</h1>
 
     <!-- Feed Grid -->
-    <div class="feed-grid" *ngIf="feedPosts.length > 1 && !showEmptyRequested">
-      <app-blog-card *ngFor="let post of feedPosts.slice(1)"
+    <div class="feed-grid" *ngIf="feedPosts.length > 0 && !showEmptyRequested">
+      <app-blog-card *ngFor="let post of feedPosts"
         [id]="post.id"
         [title]="post.title"
         [date]="post.date | date"
@@ -31,9 +20,9 @@
 
     <!-- Empty State -->
     <div class="empty-state" *ngIf="feedLoaded && (feedPosts.length === 0 || showEmptyRequested)">
-      <h2 class="font-serif text-2xl mb-4">Your feed is quiet...</h2>
+      <h2>Your feed is quiet...</h2>
       <p class="mb-8">Follow some creators to see their stories here.</p>
-      <button (click)="goToDiscover($event)" class="btn-primary">Discover People</button>
+      <button (click)="goToDiscover($event)">Discover People</button>
     </div>
 
   </main>
