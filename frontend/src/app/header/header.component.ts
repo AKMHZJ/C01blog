@@ -28,7 +28,17 @@ export class HeaderComponent {
     return this.theme.isDark();
   }
 
+  isMobileMenuOpen = false;
+
   constructor() {}
+
+  toggleMobileMenu() {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+  }
+
+  closeMobileMenu() {
+    this.isMobileMenuOpen = false;
+  }
 
   onLogoClick(event: Event) {
     event.preventDefault();
