@@ -70,6 +70,10 @@ export class PostService {
     return this.http.put<Comment>(`${this.apiUrl}/${postId}/comments/${commentId}`, { text }, this.authHeaders());
   }
 
+  toggleHide(postId: string) {
+    return this.http.put<Post>(`${this.apiUrl}/${postId}/hide`, {}, this.authHeaders());
+  }
+
   // Compatibility wrappers for older component method names
   addPost(postData: any) {
     // Expected shape: { title, excerpt, category, image, content }

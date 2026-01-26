@@ -1,6 +1,8 @@
 package com._blog.service.impl;
 
 import com._blog.controller.PostController;
+import com._blog.dto.PostRequest;
+import com._blog.dto.CommentRequest;
 import com._blog.entity.Comment;
 import com._blog.entity.Follow;
 import com._blog.entity.Post;
@@ -65,7 +67,8 @@ public class PostServiceImpl implements PostService {
             }
         } catch (Exception ignored) {}
 
-        return postRepository.findByAuthorIdIn(authorIds);
+        List<Post> posts = postRepository.findByAuthorIdIn(authorIds);
+        return posts.stream().filter(p -> !p.isHidden()).toList();
     }
 
     @Override
@@ -81,7 +84,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public Post createPost(PostController.PostRequest request, UserDetails userDetails) {
+    public Post createPost(PostRequest request, UserDetails userDetails) {
         User author = userRepository.findByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -121,7 +124,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public Comment addComment(String id, PostController.CommentRequest request, UserDetails userDetails) {
+    public Comment addComment(String id, CommentRequest request, UserDetails userDetails) {
         Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("Post not found"));
         User author = userRepository.findByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -182,7 +185,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public Comment updateComment(String postId, String commentId, PostController.CommentRequest request, UserDetails userDetails) {
+    public Comment updateComment(String postId, String commentId, CommentRequest request, UserDetails userDetails) {
         // Fetch post first to manage collection context
         Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found"));
         
@@ -206,7 +209,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public Post updatePost(String id, PostController.PostRequest request, UserDetails userDetails) {
+    public Post updatePost(String id, PostRequest request, UserDetails userDetails) {
         Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("Post not found"));
         User currentUser = userRepository.findByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -223,4 +226,19 @@ public class PostServiceImpl implements PostService {
 
         return postRepository.save(post);
     }
-}
+            @Override
+            @Transactional
+            public Post toggleHide(String id, UserDetails userDetails) {
+                Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("Post not found"));
+                User currentUser = userRepository.findByUsername(userDetails.getUsername())
+                        .orElseThrow(() -> new RuntimeException("User not found"));
+        
+                if (!currentUser.getRole().name().equals("ADMIN")) {
+                    throw new RuntimeException("Not authorized to hide/unhide posts");
+                }
+        
+                post.setHidden(!post.isHidden());
+                return postRepository.save(post);
+            }
+        }
+        

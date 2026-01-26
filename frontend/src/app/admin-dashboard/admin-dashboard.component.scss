@@ -94,6 +94,69 @@
   }
 }
 
+/* Mobile Card View Adaptation */
+@media (max-width: 820px) {
+  .table-header { display: none !important; }
+  
+  .table-container {
+    border: none;
+    background: transparent;
+  }
+  
+  .table-row {
+    display: flex;
+    flex-direction: column;
+    min-width: 0 !important;
+    background: rgba(128, 128, 128, 0.05);
+    border: 1px solid rgba(128, 128, 128, 0.1);
+    border-radius: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    gap: 1rem;
+    align-items: stretch;
+    
+    & > div {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      text-align: right;
+      
+      &:first-child {
+        justify-content: flex-start;
+        border-bottom: 1px solid rgba(128, 128, 128, 0.1);
+        padding-bottom: 1rem;
+        margin-bottom: 0.5rem;
+        text-align: left;
+        
+        & > div { text-align: left; }
+      }
+      
+      /* Reset generic styles */
+      opacity: 1 !important; 
+    }
+  }
+
+  /* Labels injection via CSS */
+  .users-table .table-row {
+    & > div:nth-child(2)::before { content: "Email"; opacity: 0.5; font-size: 0.75rem; text-transform: uppercase; margin-right: 1rem; }
+    & > div:nth-child(3)::before { content: "Role"; opacity: 0.5; font-size: 0.75rem; text-transform: uppercase; margin-right: 1rem; }
+    & > div:nth-child(4)::before { content: "Status"; opacity: 0.5; font-size: 0.75rem; text-transform: uppercase; margin-right: 1rem; }
+  }
+
+  .posts-table .table-row {
+    & > div:nth-child(2)::before { content: "Author"; opacity: 0.5; font-size: 0.75rem; text-transform: uppercase; margin-right: 1rem; }
+    & > div:nth-child(3)::before { content: "Category"; opacity: 0.5; font-size: 0.75rem; text-transform: uppercase; margin-right: 1rem; }
+    & > div:nth-child(4)::before { content: "Date"; opacity: 0.5; font-size: 0.75rem; text-transform: uppercase; margin-right: 1rem; }
+  }
+
+  .reports-table .table-row {
+    & > div:nth-child(2)::before { content: "Post"; opacity: 0.5; font-size: 0.75rem; text-transform: uppercase; margin-right: 1rem; }
+    & > div:nth-child(3)::before { content: "Reason"; opacity: 0.5; font-size: 0.75rem; text-transform: uppercase; margin-right: 1rem; }
+    & > div:nth-child(4)::before { content: "Status"; opacity: 0.5; font-size: 0.75rem; text-transform: uppercase; margin-right: 1rem; }
+  }
+}
+
 .badge {
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
@@ -136,6 +199,31 @@
     border: none;
     color: inherit;
     font-size: 1.25rem;
-    cursor: pointer;
-  }
-}
+        cursor: pointer;
+      }
+    }
+    
+    /* Modal Styles */
+    .editor-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 1.5rem;
+    }
+    
+    .editor-modal {
+      width: 100%;
+      max-width: 500px;
+      background: #fff;
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      
+      &.theme-dark { background: #171717; color: #fff; border: 1px solid rgba(255,255,255,0.1); }
+      &.theme-light { background: #fff; color: #000; }
+    }
+    

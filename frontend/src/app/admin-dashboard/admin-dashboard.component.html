@@ -49,7 +49,7 @@
     </div>
 
     <!-- Users Table -->
-    <div class="table-container font-sans" *ngIf="!loading && activeTab === 'users'">
+    <div class="table-container users-table font-sans" *ngIf="!loading && activeTab === 'users'">
       <div class="table-header">
         <div>User</div>
         <div>Email</div>
@@ -85,7 +85,7 @@
     </div>
 
     <!-- Posts Table -->
-    <div class="table-container font-sans" *ngIf="!loading && activeTab === 'posts'">
+    <div class="table-container posts-table font-sans" *ngIf="!loading && activeTab === 'posts'">
       <div class="table-header">
         <div>Title</div>
         <div>Author</div>
@@ -100,7 +100,11 @@
           <span class="badge category">{{ p.category }}</span>
         </div>
         <div style="opacity: 0.5; font-size: 0.875rem;">{{ p.date | date:'short' }}</div>
-        <div style="text-align: right;">
+        <div style="text-align: right; display: flex; gap: 1rem; justify-content: flex-end;">
+          <button (click)="toggleHidePost(p)" style="border: none; background: none; cursor: pointer;"
+                  [style.color]="p.hidden ? '#10b981' : '#6b7280'">
+            {{ p.hidden ? 'Unhide' : 'Hide' }}
+          </button>
           <button (click)="deletePost(p)" style="color: #ef4444; border: none; background: none; cursor: pointer;">Delete</button>
         </div>
       </div>
@@ -109,8 +113,24 @@
       </div>
     </div>
 
+    <!-- Confirmation Modal -->
+    <div class="editor-overlay" *ngIf="confirmationData">
+      <div class="editor-modal" style="max-width: 400px; padding: 0;" [ngClass]="isDark ? 'theme-dark' : 'theme-light'">
+        <div class="editor-header" style="padding: 1.5rem;">
+          <h2 class="font-serif text-2xl">Confirm Action</h2>
+        </div>
+        <div class="editor-body" style="padding: 1.5rem;">
+          <p>{{ confirmationData.message }}</p>
+          <div class="flex gap-4 justify-end mt-4">
+            <button (click)="cancelConfirm()" class="tab-btn" style="opacity: 1; font-size: 0.9rem;">Cancel</button>
+            <button (click)="confirmAction()" class="btn-primary" style="padding: 0.5rem 1.5rem; font-size: 0.9rem;">Confirm</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Reports Table -->
-    <div class="table-container font-sans" *ngIf="!loading && activeTab === 'reports'">
+    <div class="table-container reports-table font-sans" *ngIf="!loading && activeTab === 'reports'">
       <div class="table-header">
         <div>Reporter</div>
         <div>Reported Post</div>

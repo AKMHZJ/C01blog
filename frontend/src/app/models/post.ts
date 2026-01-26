@@ -9,6 +9,7 @@ export interface Post {
   date: string;
   likes: string[]; // Array of user IDs
   comments: Comment[];
+  hidden?: boolean;
 }
 
 export interface Comment {

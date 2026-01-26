@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../services/admin.service';
 import { ReportService } from '../services/report.service';
+import { PostService } from '../services/post.service';
 import { ThemeService } from '../services/theme.service';
 import { MatIconModule } from '@angular/material/icon';
 
@@ -22,7 +23,13 @@ export class AdminDashboardComponent implements OnInit {
   error = '';
   activeTab: 'overview' | 'users' | 'posts' | 'reports' = 'overview';
 
+  confirmationData: {
+    message: string;
+    action: () => void;
+  } | null = null;
+
   private admin = inject(AdminService);
+  private postService = inject(PostService);
   private reportService = inject(ReportService);
   public theme = inject(ThemeService);
   private cdr = inject(ChangeDetectorRef);
@@ -100,113 +107,157 @@ export class AdminDashboardComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
+  openConfirm(message: string, action: () => void) {
+    this.confirmationData = { message, action };
+  }
+
+  confirmAction() {
+    if (this.confirmationData) {
+      this.confirmationData.action();
+      this.confirmationData = null;
+    }
+  }
+
+  cancelConfirm() {
+    this.confirmationData = null;
+  }
+
   updateRole(u: any, role: 'USER' | 'ADMIN') {
-    const prev = u.role;
-    u.role = role;
-    this.admin.updateUserRole(String(u.id), role).subscribe({
-      next: () => {
-        this.cdr.detectChanges();
-      },
-      error: (e) => {
-        console.error(e);
-        u.role = prev;
-        this.error = 'Role update failed';
-        this.cdr.detectChanges();
-      }
+    this.openConfirm(`Change role of ${u.username} to ${role}?`, () => {
+      const prev = u.role;
+      u.role = role;
+      this.admin.updateUserRole(String(u.id), role).subscribe({
+        next: () => {
+          this.cdr.detectChanges();
+        },
+        error: (e) => {
+          console.error(e);
+          u.role = prev;
+          this.error = 'Role update failed';
+          this.cdr.detectChanges();
+        }
+      });
     });
   }
 
   toggleBan(u: any) {
-    const newStatus = !u.banned;
-    const originalStatus = u.banned;
-    u.banned = newStatus;
-    
-    this.admin.banUser(String(u.id), newStatus).subscribe({
-      next: () => {
-        this.cdr.detectChanges();
-      },
-      error: (e) => {
-        console.error(e);
-        u.banned = originalStatus;
-        this.error = 'Failed to update ban status';
-        this.cdr.detectChanges();
-      }
+    const action = u.banned ? 'Unban' : 'Ban';
+    this.openConfirm(`${action} user ${u.username}?`, () => {
+      const newStatus = !u.banned;
+      const originalStatus = u.banned;
+      u.banned = newStatus;
+      
+      this.admin.banUser(String(u.id), newStatus).subscribe({
+        next: () => {
+          this.cdr.detectChanges();
+        },
+        error: (e) => {
+          console.error(e);
+          u.banned = originalStatus;
+          this.error = 'Failed to update ban status';
+          this.cdr.detectChanges();
+        }
+      });
     });
   }
 
   banUserById(userId: string) {
     if (!userId) return;
-    this.admin.banUser(userId, true).subscribe({
-      next: () => {
-        // Update local user list if exists
-        const u = this.users.find(x => String(x.id) === userId);
-        if (u) u.banned = true;
-        this.refresh();
-      },
-      error: (e) => {
-        console.error(e);
-        this.error = 'Failed to ban user';
-        this.cdr.detectChanges();
-      }
+    this.openConfirm('Ban this user?', () => {
+      this.admin.banUser(userId, true).subscribe({
+        next: () => {
+          // Update local user list if exists
+          const u = this.users.find(x => String(x.id) === userId);
+          if (u) u.banned = true;
+          this.refresh();
+        },
+        error: (e) => {
+          console.error(e);
+          this.error = 'Failed to ban user';
+          this.cdr.detectChanges();
+        }
+      });
     });
   }
 
   deleteUser(u: any) {
-    if (!confirm(`Are you sure you want to permanently delete user ${u.username}? This will also delete all their posts and comments.`)) return;
-    this.admin.deleteUser(String(u.id)).subscribe({
-      next: () => {
-        this.users = this.users.filter(x => String(x.id) !== String(u.id));
-        this.refresh();
-      },
-      error: (e) => {
-        console.error(e);
-        this.error = 'Delete failed';
-        this.cdr.detectChanges();
-      }
+    this.openConfirm(`Permanently delete user ${u.username}? This will also delete all their posts and comments.`, () => {
+      this.admin.deleteUser(String(u.id)).subscribe({
+        next: () => {
+          this.users = this.users.filter(x => String(x.id) !== String(u.id));
+          this.refresh();
+        },
+        error: (e) => {
+          console.error(e);
+          this.error = 'Delete failed';
+          this.cdr.detectChanges();
+        }
+      });
     });
   }
 
   deletePost(p: any) {
-    if (!confirm(`Delete post "${p.title}"?`)) return;
-    this.admin.deletePost(String(p.id)).subscribe({
-      next: () => {
-        this.posts = this.posts.filter(x => String(x.id) !== String(p.id));
-        this.refresh();
-      },
-      error: (e) => {
-        console.error(e);
-        this.error = 'Failed to delete post';
-        this.cdr.detectChanges();
-      }
+    this.openConfirm(`Delete post "${p.title}"?`, () => {
+      this.admin.deletePost(String(p.id)).subscribe({
+        next: () => {
+          this.posts = this.posts.filter(x => String(x.id) !== String(p.id));
+          this.refresh();
+        },
+        error: (e) => {
+          console.error(e);
+          this.error = 'Failed to delete post';
+          this.cdr.detectChanges();
+        }
+      });
+    });
+  }
+
+  toggleHidePost(p: any) {
+    const action = p.hidden ? 'Unhide' : 'Hide';
+    this.openConfirm(`${action} post "${p.title}"?`, () => {
+      this.postService.toggleHide(String(p.id)).subscribe({
+        next: (updated) => {
+          p.hidden = updated.hidden;
+          this.cdr.detectChanges();
+        },
+        error: (e) => {
+          console.error(e);
+          this.error = 'Failed to update post visibility';
+          this.cdr.detectChanges();
+        }
+      });
     });
   }
 
   deletePostById(postId: string) {
     if (!postId) return;
-    if (!confirm('Delete this reported post?')) return;
-    this.admin.deletePost(postId).subscribe({
-      next: () => {
-        this.refresh();
-      },
-      error: (e) => {
-        console.error(e);
-        this.error = 'Failed to delete post';
-        this.cdr.detectChanges();
-      }
+    this.openConfirm('Delete this reported post?', () => {
+      this.admin.deletePost(postId).subscribe({
+        next: () => {
+          this.refresh();
+        },
+        error: (e) => {
+          console.error(e);
+          this.error = 'Failed to delete post';
+          this.cdr.detectChanges();
+        }
+      });
     });
   }
 
   resolveReport(r: any, status: 'RESOLVED' | 'DISMISSED') {
-    this.reportService.updateStatus(String(r.id), status).subscribe({
-      next: () => {
-        r.status = status;
-        this.cdr.detectChanges();
-      },
-      error: (e) => {
-        console.error(e);
-        this.error = 'Failed to update report status';
-        this.cdr.detectChanges();
-      }
+    this.openConfirm(`Mark report as ${status}?`, () => {
+      this.reportService.updateStatus(String(r.id), status).subscribe({
+        next: () => {
+          r.status = status;
+          this.cdr.detectChanges();
+        },
+        error: (e) => {
+          console.error(e);
+          this.error = 'Failed to update report status';
+          this.cdr.detectChanges();
+        }
+      });
     });
   }
 }

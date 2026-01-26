@@ -38,6 +38,9 @@ public class Post {
     @JoinColumn(name = "post_id")
     private List<Comment> comments = new ArrayList<>();
 
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean hidden = false;
+
     public Post() {}
 
     public Post(String id, String title, String excerpt, String content, String category, String image, LocalDateTime date, User author, List<String> likes, List<Comment> comments) {
@@ -51,10 +54,14 @@ public class Post {
         this.author = author;
         this.likes = likes != null ? likes : new ArrayList<>();
         this.comments = comments != null ? comments : new ArrayList<>();
+        this.hidden = false;
     }
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
+
+    public boolean isHidden() { return hidden; }
+    public void setHidden(boolean hidden) { this.hidden = hidden; }
 
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }

@@ -3,6 +3,8 @@ package com._blog.controller;
 import com._blog.entity.Post;
 import com._blog.entity.Comment;
 import com._blog.service.PostService;
+import com._blog.dto.PostRequest;
+import com._blog.dto.CommentRequest;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -78,6 +80,14 @@ public class PostController {
         return postService.updatePost(id, request, userDetails);
     }
 
-    public record PostRequest(String title, String excerpt, String category, String image, List<String> content) {}
-    public record CommentRequest(String text) {}
-}
+        @PutMapping("/{id}/hide")
+
+        public Post toggleHide(@PathVariable String id, @AuthenticationPrincipal UserDetails userDetails) {
+
+            return postService.toggleHide(id, userDetails);
+
+        }
+
+    }
+
+    
