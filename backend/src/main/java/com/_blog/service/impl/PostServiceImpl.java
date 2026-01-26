@@ -91,6 +91,7 @@ public class PostServiceImpl implements PostService {
         post.setCategory(request.category());
         post.setImage(request.image());
         post.setDate(LocalDateTime.now());
+        post.setAuthor(author);
         post.setContentList(request.content());
 
         Post savedPost = postRepository.save(post);
