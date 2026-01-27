@@ -1,6 +1,8 @@
 package com._blog.repository;
 
 import com._blog.entity.Post;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
@@ -9,12 +11,18 @@ public interface PostRepository extends JpaRepository<Post, String> {
     List<Post> findByAuthorId(Long userId);
     
     // Find posts authored by any of the given author ids
-    List<Post> findByAuthorIdIn(List<Long> userIds);
+    Page<Post> findByAuthorIdIn(List<Long> userIds, Pageable pageable);
+    
+    Page<Post> findByAuthorIdInAndHiddenFalse(List<Long> userIds, Pageable pageable);
 
     long countByAuthorId(Long userId);
 
     void deleteByAuthorId(Long userId);
     
     // Helper to sort by newest first
+    Page<Post> findAllByOrderByDateDesc(Pageable pageable);
+    
+    Page<Post> findAllByHiddenFalseOrderByDateDesc(Pageable pageable);
+    
     List<Post> findAllByOrderByDateDesc();
 }

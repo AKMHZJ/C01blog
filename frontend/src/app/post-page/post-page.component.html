@@ -50,7 +50,7 @@
 
     <!-- 5. Content -->
     <div class="post-content">
-      <p *ngFor="let paragraph of post.content">{{ paragraph }}</p>
+      <markdown *ngFor="let paragraph of post.content" [data]="paragraph"></markdown>
     </div>
 
     <!-- 6. Comments Section -->

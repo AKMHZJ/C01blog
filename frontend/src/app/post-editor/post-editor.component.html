@@ -41,9 +41,24 @@
       </div>
 
       <div>
-        <label class="text-xs uppercase opacity-50">Content</label>
-        <textarea [(ngModel)]="content" name="content" required class="textarea-field" placeholder="Write your story..."></textarea>
-        <p class="text-xs opacity-40 mt-2">Blank lines create separate paragraphs.</p>
+        <div class="flex justify-between items-center mb-2">
+          <label class="text-xs uppercase opacity-50">Content</label>
+          <div class="flex gap-2">
+             <button type="button" (click)="showPreview = false" class="text-xs px-2 py-1 rounded" 
+                     [class.bg-gray-200]="!showPreview" [class.text-black]="!showPreview">Write</button>
+             <button type="button" (click)="showPreview = true" class="text-xs px-2 py-1 rounded" 
+                     [class.bg-gray-200]="showPreview" [class.text-black]="showPreview">Preview</button>
+          </div>
+        </div>
+        
+        <div *ngIf="!showPreview">
+          <textarea [(ngModel)]="content" name="content" required class="textarea-field" placeholder="Write your story (Markdown supported)..."></textarea>
+          <p class="text-xs opacity-40 mt-2">Blank lines create separate paragraphs.</p>
+        </div>
+        
+        <div *ngIf="showPreview" class="preview-box p-4 border rounded min-h-[150px] prose dark:prose-invert max-w-none">
+          <markdown [data]="content"></markdown>
+        </div>
       </div>
 
       <div class="flex gap-4 pt-4">

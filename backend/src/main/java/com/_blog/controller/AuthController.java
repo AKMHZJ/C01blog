@@ -1,7 +1,10 @@
 package com._blog.controller;
 
+import com._blog.dto.LoginRequest;
+import com._blog.dto.SignupRequest;
 import com._blog.entity.User;
 import com._blog.service.AuthService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,17 +21,14 @@ public class AuthController {
         this.authService = authService;
     }
 
-    public record SignupRequest(String email, String username, String password, String displayName) {}
-    public record LoginRequest(String username, String password) {}
-
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody SignupRequest req) {
+    public ResponseEntity<?> signup(@Valid @RequestBody SignupRequest req) {
         try {
             User user = new User();
-            user.setEmail(req.email());
-            user.setUsername(req.username());
-            user.setPassword(req.password());
-            user.setDisplayName(req.displayName());
+            user.setEmail(req.getEmail());
+            user.setUsername(req.getUsername());
+            user.setPassword(req.getPassword());
+            user.setDisplayName(req.getDisplayName());
             
             User saved = authService.registerUser(user);
             return ResponseEntity.ok(saved);
@@ -38,9 +38,9 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest req) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest req) {
         try {
-            Map<String, Object> resp = authService.login(req.username(), req.password());
+            Map<String, Object> resp = authService.login(req.getUsername(), req.getPassword());
             return ResponseEntity.ok(resp);
         } catch (Exception e) {
             return ResponseEntity.status(401).body(e.getMessage());

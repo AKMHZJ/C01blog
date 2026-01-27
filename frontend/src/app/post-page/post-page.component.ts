@@ -10,11 +10,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ImageUrlPipe } from '../pipes/image-url.pipe';
 import { ReportDialogComponent } from '../report-dialog/report-dialog.component';
+import { MarkdownModule } from 'ngx-markdown';
 
 @Component({
   selector: 'app-post-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, MatDialogModule, ImageUrlPipe],
+  imports: [CommonModule, FormsModule, MatIconModule, MatDialogModule, ImageUrlPipe, MarkdownModule],
   templateUrl: './post-page.component.html',
   styleUrls: ['./post-page.component.scss']
 })

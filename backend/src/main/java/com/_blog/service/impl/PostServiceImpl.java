@@ -40,19 +40,19 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<Post> getAllPosts() {
-        return postRepository.findAllByOrderByDateDesc();
+    public org.springframework.data.domain.Page<Post> getAllPosts(int page, int size) {
+        return postRepository.findAllByHiddenFalseOrderByDateDesc(org.springframework.data.domain.PageRequest.of(page, size));
     }
 
     @Override
-    public List<Post> getFeed(UserDetails userDetails) {
+    public org.springframework.data.domain.Page<Post> getFeed(UserDetails userDetails, int page, int size) {
         if (userDetails == null) {
-            return new ArrayList<>();
+            return org.springframework.data.domain.Page.empty();
         }
 
         User currentUser = userRepository.findByUsername(userDetails.getUsername()).orElse(null);
         if (currentUser == null) {
-            return new ArrayList<>();
+            return org.springframework.data.domain.Page.empty();
         }
 
         List<Long> authorIds = new ArrayList<>();
@@ -67,8 +67,7 @@ public class PostServiceImpl implements PostService {
             }
         } catch (Exception ignored) {}
 
-        List<Post> posts = postRepository.findByAuthorIdIn(authorIds);
-        return posts.stream().filter(p -> !p.isHidden()).toList();
+        return postRepository.findByAuthorIdInAndHiddenFalse(authorIds, org.springframework.data.domain.PageRequest.of(page, size));
     }
 
     @Override

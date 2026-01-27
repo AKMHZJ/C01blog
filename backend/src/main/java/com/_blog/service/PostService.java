@@ -5,13 +5,14 @@ import com._blog.dto.PostRequest;
 import com._blog.dto.CommentRequest;
 import com._blog.entity.Comment;
 import com._blog.entity.Post;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.List;
 
 public interface PostService {
-    List<Post> getAllPosts();
-    List<Post> getFeed(UserDetails userDetails);
+    Page<Post> getAllPosts(int page, int size);
+    Page<Post> getFeed(UserDetails userDetails, int page, int size);
     Post getPost(String id);
     List<Post> getUserPosts(Long userId);
     

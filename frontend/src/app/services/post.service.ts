@@ -3,6 +3,15 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Post, Comment } from '../models/post';
 
+export interface Page<T> {
+  content: T[];
+  totalPages: number;
+  totalElements: number;
+  last: boolean;
+  size: number;
+  number: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -30,12 +39,12 @@ export class PostService {
     return this.http.post<{ url: string }>(`${this.mediaUrl}/upload`, formData, this.authHeaders(true));
   }
 
-  getPosts(): Observable<Post[]> {
-    return this.http.get<Post[]>(this.apiUrl, this.authHeaders());
+  getPosts(page: number = 0, size: number = 5): Observable<Page<Post>> {
+    return this.http.get<Page<Post>>(`${this.apiUrl}?page=${page}&size=${size}`, this.authHeaders());
   }
 
-  getFeed(): Observable<Post[]> {
-    return this.http.get<Post[]>(`${this.apiUrl}/feed`, this.authHeaders());
+  getFeed(page: number = 0, size: number = 5): Observable<Page<Post>> {
+    return this.http.get<Page<Post>>(`${this.apiUrl}/feed?page=${page}&size=${size}`, this.authHeaders());
   }
 
   getPost(id: string): Observable<Post> {

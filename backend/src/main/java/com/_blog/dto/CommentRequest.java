@@ -1,3 +1,8 @@
 package com._blog.dto;
 
-public record CommentRequest(String text) {}
+import jakarta.validation.constraints.NotBlank;
+
+public record CommentRequest(
+    @NotBlank(message = "Comment text cannot be empty")
+    String text
+) {}

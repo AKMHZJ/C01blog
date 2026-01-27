@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, HostListener } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -20,6 +20,11 @@ export class HomeComponent implements OnInit {
   feedPosts: Post[] = [];
   feedLoaded = false;
   showEmptyRequested = false;
+  
+  page = 0;
+  size = 5;
+  hasMore = true;
+  isLoading = false;
 
   private router = inject(Router);
   private postService = inject(PostService);
@@ -53,21 +58,35 @@ export class HomeComponent implements OnInit {
 
   loadFeed(isLoggedIn: boolean) {
     this.feedLoaded = false;
+    this.feedPosts = [];
+    this.page = 0;
+    this.hasMore = true;
     
     if (!isLoggedIn) {
       setTimeout(() => {
-        this.feedPosts = [];
         this.feedLoaded = true;
         this.cdr.markForCheck();
       }, 0);
       return;
     }
 
-    this.postService.getFeed().subscribe({
-      next: (posts) => {
-        // Defer state update to avoid NG0100 (ExpressionChangedAfterItHasBeenCheckedError)
+    this.fetchPosts();
+  }
+
+  fetchPosts() {
+    if (this.isLoading || !this.hasMore) return;
+    this.isLoading = true;
+
+    this.postService.getFeed(this.page, this.size).subscribe({
+      next: (pageData) => {
+        // Defer state update to avoid NG0100
         setTimeout(() => {
-          this.feedPosts = posts || [];
+          const newPosts = pageData.content || [];
+          this.feedPosts = [...this.feedPosts, ...newPosts];
+          this.hasMore = !pageData.last;
+          this.page++;
+          
+          this.isLoading = false;
           this.feedLoaded = true;
           if (this.feedPosts.length > 0) this.showEmptyRequested = false;
           this.cdr.markForCheck();
@@ -76,11 +95,19 @@ export class HomeComponent implements OnInit {
       error: (err) => {
         console.error('[Home] failed to load feed', err);
         setTimeout(() => {
+          this.isLoading = false;
           this.feedLoaded = true;
           this.cdr.markForCheck();
         }, 0);
       },
     });
+  }
+
+  @HostListener('window:scroll', [])
+  onScroll(): void {
+    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
+      this.fetchPosts();
+    }
   }
 
   goToDiscover(event: Event) {

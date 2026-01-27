@@ -26,8 +26,13 @@ public class MediaController {
         }
 
         try {
+            Path uploadPath = Paths.get(UPLOAD_DIR);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
             String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-            Path path = Paths.get(UPLOAD_DIR + fileName);
+            Path path = uploadPath.resolve(fileName);
             Files.copy(file.getInputStream(), path);
 
             String fileUrl = "/api/media/files/" + fileName;

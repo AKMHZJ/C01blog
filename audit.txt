@@ -1,0 +1,151 @@
+Is the source code organized with a clear and logical folder structure?
+Yes
+
+Is a README file included with setup instructions and used technologies?
+Yes
+
+Functional
+
+Is the project structured as a fullstack application with separate backend (Spring Boot) and frontend (Angular)?
+Yes
+
+Is the communication between frontend and backend done through REST APIs?
+Yes
+
+Is user authentication implemented using JWT or Spring Security?
+Yes
+
+Is role-based access control (admin/user) correctly enforced?
+Yes
+
+Are user sessions and authentication tokens securely managed?
+Yes
+
+Are all actions (posting, liking, commenting, subscribing, reporting) properly validated?
+Yes (Added @Valid and DTOs).
+
+Is error handling present on both backend and frontend?
+Yes
+
+Are media files (images/videos) uploaded and stored securely?
+Yes
+
+Are posts created, edited, and deleted with appropriate access control?
+Yes
+
+Do users receive notifications when subscribed profiles publish posts?
+Yes
+
+Backend Logic & Security
+
+Is the password stored using a hashing algorithm (e.g., BCrypt)?
+Yes
+
+Are database relationships (e.g., users, posts, comments, reports) correctly set up?
+Yes
+
+Are reports on profiles/posts saved with reasons and timestamps?
+Yes
+
+Are reports hidden from regular users and visible only to admins?
+Yes
+
+Is all input sanitized to prevent SQL injection or XSS attacks?
+Yes
+
+Are all admin-only routes protected by access control?
+Yes
+
+Can the admin delete or ban users and remove inappropriate posts?
+Yes
+
+Are notifications generated automatically when new posts are made?
+Yes
+
+Frontend (Angular)
+
+Is the UI divided into Angular components with proper routing and services?
+Yes
+
+Is the UI responsive and mobile-friendly?
+Yes
+
+Are media uploads previewed before submission?
+Yes
+
+Are user roles reflected in the interface (admin tools not visible to regular users)?
+Yes
+
+Can users like, comment, and view posts smoothly?
+Yes
+
+Are all actions (post/report/subscribe) confirmed with visual feedback?
+Yes
+
+Is there a user-friendly UI for reporting users with a reason?
+Yes
+
+Is Angular Material or Bootstrap used for styling and components?
+Yes
+
+Post Interactions
+
+Can users create, edit, and delete posts?
+Yes
+
+Are media, timestamps, likes, and comments shown on each post?
+Yes
+
+Can users like and comment on others' posts?
+Yes
+
+Are deleted posts and comments removed correctly from the interface?
+Yes
+
+Are uploaded files retrievable without corruption?
+Yes
+
+Admin Functionality
+
+Can the admin view all users, posts, and submitted reports?
+Yes
+
+Can the admin delete or ban users?
+Yes
+
+Can the admin remove or hide posts?
+Yes
+
+Is there a dedicated admin dashboard with clear navigation?
+Yes
+
+Are admin actions confirmed before they take effect?
+Yes
+
+Testing and Stability
+
+Is the app functional under multiple users?
+Yes
+
+Does the app handle edge cases (e.g., empty posts, invalid files, duplicate usernames)?
+Yes
+
+Is the browser console free of errors?
+Yes
+
+Are invalid routes or actions handled with proper error messages?
+Yes
+
+Bonus
+
+Is there infinite scrolling on the post feed?
+Yes
+
+Is dark mode toggle available?
+Yes
+
+Are basic admin analytics visible (e.g., number of posts, reported users)?
+Yes
+
+Does the post editor support Markdown?
+Yes

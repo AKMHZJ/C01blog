@@ -1,14 +1,15 @@
-import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { PostService } from '../services/post.service';
 import { NotificationService } from '../services/notification.service';
+import { MarkdownModule } from 'ngx-markdown';
 
 @Component({
   selector: 'app-post-editor',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule],
+  imports: [CommonModule, FormsModule, MatIconModule, MarkdownModule],
   templateUrl: './post-editor.component.html',
   styleUrls: ['./post-editor.component.scss']
 })
@@ -20,6 +21,7 @@ export class PostEditorComponent {
 
   private postService = inject(PostService);
   private notificationService = inject(NotificationService);
+  private cdr = inject(ChangeDetectorRef);
 
   isDark = true;
   title = '';
@@ -28,6 +30,8 @@ export class PostEditorComponent {
   image = '';
   content = '';
   isUploading = false;
+  
+  showPreview = false;
 
   ngOnInit() {
     if (this.post) {
@@ -39,20 +43,30 @@ export class PostEditorComponent {
     }
   }
 
+  togglePreview() {
+    this.showPreview = !this.showPreview;
+  }
+
   onFileSelected(event: any) {
     const file: File = event.target.files[0];
     if (file) {
       this.isUploading = true;
       this.postService.uploadImage(file).subscribe({
         next: (res) => {
-          this.image = res.url;
-          this.isUploading = false;
-          this.notificationService.showSuccess('Image uploaded successfully');
+          setTimeout(() => {
+            this.image = res.url;
+            this.isUploading = false;
+            this.notificationService.showSuccess('Image uploaded successfully');
+            this.cdr.detectChanges();
+          }, 0);
         },
         error: (err) => {
           console.error('Upload error:', err);
-          this.isUploading = false;
-          this.notificationService.showError('Failed to upload image');
+          setTimeout(() => {
+            this.isUploading = false;
+            this.notificationService.showError('Failed to upload image');
+            this.cdr.detectChanges();
+          }, 0);
         }
       });
     }
