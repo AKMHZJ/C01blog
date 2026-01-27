@@ -5,6 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { UserService, UserSummary } from '../services/user.service';
 import { ThemeService } from '../services/theme.service';
 import { ImageUrlPipe } from '../pipes/image-url.pipe';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-discover-page',
@@ -20,6 +21,7 @@ export class DiscoverPageComponent implements OnInit {
 
   private router = inject(Router);
   private userService = inject(UserService);
+  private authService = inject(AuthService);
   private cdr = inject(ChangeDetectorRef);
   public theme = inject(ThemeService);
 
@@ -38,16 +40,9 @@ export class DiscoverPageComponent implements OnInit {
       }
     });
 
-    if (isPlatformBrowser(this.platformId)) {
-      const userStr = localStorage.getItem('currentUser');
-      if (userStr) {
-        try {
-          const u = JSON.parse(userStr);
-          this.currentUserId = u.id || '';
-        } catch (e) {
-          this.currentUserId = '';
-        }
-      }
+    const user = this.authService.currentUser();
+    if (user) {
+      this.currentUserId = String(user.id || '');
     }
 
     this.loadData();
@@ -56,7 +51,8 @@ export class DiscoverPageComponent implements OnInit {
   loadData() {
     this.userService.getUsers().subscribe({
       next: (users) => {
-        this.users = users || [];
+        // Filter out current user
+        this.users = (users || []).filter(u => String(u.id) !== this.currentUserId);
         this.cdr.detectChanges();
       },
       error: (err) => console.error('[Discover] Failed to load users', err)
