@@ -36,6 +36,7 @@ public class Post {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "post_id")
+    @OrderBy("timestamp DESC")
     private List<Comment> comments = new ArrayList<>();
 
     @Column(nullable = false, columnDefinition = "boolean default false")

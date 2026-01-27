@@ -93,7 +93,7 @@ export class PostPageComponent implements OnInit {
       setTimeout(() => {
         if (this.post) {
           if (!this.post.comments) this.post.comments = [];
-          this.post.comments.push(comment);
+          this.post.comments.unshift(comment);
         }
         this.commentText = '';
         this.cdr.detectChanges();

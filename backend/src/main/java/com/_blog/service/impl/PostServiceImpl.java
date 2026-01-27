@@ -20,6 +20,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+
 @Service
 public class PostServiceImpl implements PostService {
 
@@ -41,7 +44,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public org.springframework.data.domain.Page<Post> getAllPosts(int page, int size) {
-        return postRepository.findAllByHiddenFalseOrderByDateDesc(org.springframework.data.domain.PageRequest.of(page, size));
+        return postRepository.findAllByHiddenFalseOrderByDateDesc(PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "date")));
     }
 
     @Override
@@ -67,7 +70,7 @@ public class PostServiceImpl implements PostService {
             }
         } catch (Exception ignored) {}
 
-        return postRepository.findByAuthorIdInAndHiddenFalse(authorIds, org.springframework.data.domain.PageRequest.of(page, size));
+        return postRepository.findByAuthorIdInAndHiddenFalse(authorIds, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "date")));
     }
 
     @Override
@@ -78,7 +81,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<Post> getUserPosts(Long userId) {
-        return postRepository.findByAuthorId(userId);
+        return postRepository.findByAuthorIdOrderByDateDesc(userId);
     }
 
     @Override
