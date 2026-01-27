@@ -25,7 +25,6 @@ export class PostEditorComponent {
 
   isDark = true;
   title = '';
-  excerpt = '';
   category = 'Lifestyle';
   image = '';
   content = '';
@@ -36,7 +35,6 @@ export class PostEditorComponent {
   ngOnInit() {
     if (this.post) {
       this.title = this.post.title;
-      this.excerpt = this.post.excerpt;
       this.category = this.post.category;
       this.image = this.post.image;
       this.content = this.post.content.join('\n\n');
@@ -45,6 +43,27 @@ export class PostEditorComponent {
 
   togglePreview() {
     this.showPreview = !this.showPreview;
+  }
+
+  insertMarkdown(prefix: string, suffix: string) {
+    const textarea = document.querySelector('.textarea-content') as HTMLTextAreaElement;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = this.content;
+    const before = text.substring(0, start);
+    const selected = text.substring(start, end);
+    const after = text.substring(end);
+
+    this.content = before + prefix + selected + suffix + after;
+    
+    // Restore focus and selection (async to let binding update)
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + prefix.length, end + prefix.length);
+      this.cdr.detectChanges(); // Force check in case binding didn't update view yet
+    }, 0);
   }
 
   onFileSelected(event: any) {
@@ -80,9 +99,13 @@ export class PostEditorComponent {
   }
 
   handleSubmit() {
+    // Auto-generate excerpt from content
+    const plainText = this.content.replace(/[#*`_]/g, ''); // Simple markdown strip
+    const generatedExcerpt = plainText.length > 150 ? plainText.substring(0, 147) + '...' : plainText;
+
     const payload = {
       title: this.title,
-      excerpt: this.excerpt,
+      excerpt: generatedExcerpt,
       category: this.category,
       image: this.image || 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1080',
       content: this.content.split('\n\n').filter(p => p.trim()),

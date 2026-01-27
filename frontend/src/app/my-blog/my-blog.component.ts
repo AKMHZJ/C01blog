@@ -55,12 +55,15 @@ export class MyBlogComponent implements OnInit {
         // Defer initial load to avoid NG0100
         setTimeout(() => {
           this.user = u;
-          this.loadUserPosts(u.id);
-          // Also fetch detailed user info for counts
-          this.userService.getMe().subscribe(detailedUser => {
-            this.user = detailedUser;
-            this.cdr.markForCheck();
-          });
+          if (u.id) {
+            this.loadUserPosts(u.id);
+            // Also fetch detailed user info for counts
+            this.userService.getMe().subscribe(detailedUser => {
+              this.user = detailedUser;
+              this.cdr.markForCheck();
+            });
+          }
+          this.cdr.markForCheck();
         }, 0);
       }
     });

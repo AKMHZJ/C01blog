@@ -1,71 +1,94 @@
 <div class="editor-overlay">
   <div class="editor-modal" [ngClass]="isDark ? 'theme-dark' : 'theme-light'">
 
+    <!-- Header / Actions -->
     <div class="editor-header">
-      <h2 class="font-serif text-3xl">{{ post ? 'Edit Post' : 'Create New Post' }}</h2>
-      <button (click)="cancel.emit()" class="icon-btn">
-        <mat-icon>close</mat-icon>
-      </button>
+      <h2 class="font-serif text-2xl font-bold opacity-80">{{ post ? 'Edit Story' : 'New Story' }}</h2>
+      <div class="flex gap-4">
+        <button (click)="cancel.emit()" class="btn-text">Cancel</button>
+        <button (click)="handleSubmit()" [disabled]="isLoading || isUploading || !title.trim()" class="btn-primary small">
+          {{ isLoading ? 'Publishing...' : 'Publish' }}
+        </button>
+      </div>
     </div>
 
-    <form (ngSubmit)="handleSubmit()" class="editor-body">
-      <div>
-        <label class="text-xs uppercase opacity-50">Title</label>
-        <input [(ngModel)]="title" name="title" required class="input-field font-serif text-2xl" placeholder="Give it a name...">
-      </div>
+    <div class="editor-scroll-container">
+      <div class="editor-content-wrapper">
+        
+        <!-- Cover Image -->
+        <div class="cover-image-section">
+          <div *ngIf="image" class="image-preview relative group">
+            <img [src]="getFullImageUrl(image)" class="w-full h-64 object-cover rounded-lg shadow-sm">
+            <button class="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition"
+                    (click)="fileInput.click()">
+              <mat-icon>edit</mat-icon>
+            </button>
+          </div>
+          
+          <div *ngIf="!image" class="upload-placeholder" (click)="fileInput.click()">
+            <mat-icon class="text-4xl opacity-40">add_photo_alternate</mat-icon>
+            <span class="mt-2 text-sm opacity-60">Add a cover image</span>
+          </div>
+          <input type="file" (change)="onFileSelected($event)" accept="image/*" class="hidden" #fileInput>
+        </div>
 
-      <div>
-        <label class="text-xs uppercase opacity-50">Excerpt</label>
-        <input [(ngModel)]="excerpt" name="excerpt" class="input-field" placeholder="Brief summary...">
-      </div>
+        <!-- Title -->
+        <div class="title-section mt-8">
+          <input [(ngModel)]="title" name="title" required 
+                 class="input-title font-serif text-4xl font-bold w-full bg-transparent outline-none placeholder-opacity-30" 
+                 placeholder="Title">
+        </div>
 
-      <div class="grid cols-2">
-        <div>
-          <label class="text-xs uppercase opacity-50">Category</label>
-          <select [(ngModel)]="category" name="category" class="input-field">
+        <!-- Category -->
+        <div class="category-section mt-4 mb-8">
+          <select [(ngModel)]="category" name="category" class="input-category bg-transparent opacity-60 text-sm uppercase tracking-wide border-none outline-none cursor-pointer hover:opacity-100 transition">
             <option>Technology</option>
             <option>Lifestyle</option>
             <option>Tech</option>
             <option>News</option>
           </select>
         </div>
-        <div class="upload-zone">
-          <input type="file" (change)="onFileSelected($event)" accept="image/*" class="hidden" #fileInput>
-          <button type="button" (click)="fileInput.click()" class="btn-primary" style="font-size: 0.875rem;">
-            {{ image ? 'Change Image' : 'Upload Header Image' }}
-          </button>
-          <div *ngIf="image" style="margin-top: 1rem;">
-            <img [src]="getFullImageUrl(image)" class="rounded-lg">
+
+        <!-- Editor Toolbar -->
+        <div class="editor-toolbar sticky top-0 z-20 flex items-center gap-2 py-3 border-b border-gray-100 dark:border-gray-800 bg-opacity-95 backdrop-blur-sm transition-colors"
+             [ngClass]="isDark ? 'bg-black' : 'bg-white'">
+          
+          <div class="flex gap-1" *ngIf="!showPreview">
+            <button (click)="insertMarkdown('**', '**')" class="tool-btn" title="Bold"><mat-icon>format_bold</mat-icon></button>
+            <button (click)="insertMarkdown('*', '*')" class="tool-btn" title="Italic"><mat-icon>format_italic</mat-icon></button>
+            <button (click)="insertMarkdown('# ', '')" class="tool-btn" title="Heading"><mat-icon>title</mat-icon></button>
+            <button (click)="insertMarkdown('> ', '')" class="tool-btn" title="Quote"><mat-icon>format_quote</mat-icon></button>
+            <button (click)="insertMarkdown('`', '`')" class="tool-btn" title="Code"><mat-icon>code</mat-icon></button>
+            <button (click)="insertMarkdown('[', '](url)')" class="tool-btn" title="Link"><mat-icon>link</mat-icon></button>
+            <div class="divider mx-2 w-px h-6 bg-gray-200 dark:bg-gray-700"></div>
+          </div>
+
+          <div class="flex ml-auto bg-gray-100 dark:bg-gray-800 rounded p-1">
+             <button (click)="showPreview = false" class="text-xs px-3 py-1 rounded transition" 
+                     [class.bg-white]="!showPreview && !isDark" 
+                     [class.bg-gray-600]="!showPreview && isDark"
+                     [class.shadow-sm]="!showPreview">Write</button>
+             <button (click)="showPreview = true" class="text-xs px-3 py-1 rounded transition" 
+                     [class.bg-white]="showPreview && !isDark"
+                     [class.bg-gray-600]="showPreview && isDark"
+                     [class.shadow-sm]="showPreview">Preview</button>
           </div>
         </div>
-      </div>
 
-      <div>
-        <div class="flex justify-between items-center mb-2">
-          <label class="text-xs uppercase opacity-50">Content</label>
-          <div class="flex gap-2">
-             <button type="button" (click)="showPreview = false" class="text-xs px-2 py-1 rounded" 
-                     [class.bg-gray-200]="!showPreview" [class.text-black]="!showPreview">Write</button>
-             <button type="button" (click)="showPreview = true" class="text-xs px-2 py-1 rounded" 
-                     [class.bg-gray-200]="showPreview" [class.text-black]="showPreview">Preview</button>
+        <!-- Content Area -->
+        <div class="content-section min-h-[400px] mt-6">
+          <textarea *ngIf="!showPreview" 
+                    [(ngModel)]="content" name="content" 
+                    class="textarea-content w-full h-full min-h-[500px] bg-transparent outline-none resize-none text-lg leading-relaxed font-serif" 
+                    placeholder="Tell your story..."></textarea>
+          
+          <div *ngIf="showPreview" class="preview-content prose dark:prose-invert max-w-none text-lg leading-relaxed font-serif">
+             <markdown [data]="content || '*Nothing written yet...*'"></markdown>
           </div>
         </div>
-        
-        <div *ngIf="!showPreview">
-          <textarea [(ngModel)]="content" name="content" required class="textarea-field" placeholder="Write your story (Markdown supported)..."></textarea>
-          <p class="text-xs opacity-40 mt-2">Blank lines create separate paragraphs.</p>
-        </div>
-        
-        <div *ngIf="showPreview" class="preview-box p-4 border rounded min-h-[150px] prose dark:prose-invert max-w-none">
-          <markdown [data]="content"></markdown>
-        </div>
-      </div>
 
-      <div class="flex gap-4 pt-4">
-        <button type="submit" [disabled]="isLoading || isUploading" class="btn-primary" style="flex: 1; padding: 1.25rem;">
-          {{ isLoading ? 'Processing...' : (post ? 'Update Post' : 'Publish Post') }}
-        </button>
       </div>
-    </form>
+    </div>
+
   </div>
 </div>

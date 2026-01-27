@@ -54,8 +54,12 @@ export class AuthService {
             role: user.role || 'USER',
           };
           localStorage.setItem('currentUser', JSON.stringify(mappedUser));
-          this.currentUser.set(mappedUser);
-          this.loggedIn.set(true);
+          
+          // Defer signal update to avoid NG0100 during initialization
+          setTimeout(() => {
+            this.currentUser.set(mappedUser);
+            this.loggedIn.set(true);
+          }, 0);
         }
       },
       error: (err) => {
