@@ -1,4 +1,4 @@
-@import '../../styles.scss'; // Assuming global styles might have some vars, but we'll define local ones too.
+@use '../../styles.scss'; // Assuming global styles might have some vars, but we'll define local ones too.
 
 // --- Variables ---
 $spacing-unit: 0.25rem; // 1 unit = 0.25rem (Tailwind-like)

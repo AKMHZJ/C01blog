@@ -11,13 +11,42 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ImageUrlPipe } from '../pipes/image-url.pipe';
 import { ReportDialogComponent } from '../report-dialog/report-dialog.component';
 import { MarkdownModule } from 'ngx-markdown';
+import { trigger, transition, style, animate, query, group } from '@angular/animations';
 
 @Component({
   selector: 'app-post-page',
   standalone: true,
   imports: [CommonModule, FormsModule, MatIconModule, MatDialogModule, ImageUrlPipe, MarkdownModule],
   templateUrl: './post-page.component.html',
-  styleUrls: ['./post-page.component.scss']
+  styleUrls: ['./post-page.component.scss'],
+  animations: [
+    trigger('carouselAnimation', [
+      transition(':increment', [
+        query(':enter, :leave', style({ position: 'absolute', width: '100%', height: '100%' }), { optional: true }),
+        group([
+          query(':leave', [
+            animate('300ms ease-out', style({ opacity: 0, transform: 'scale(0.95)' }))
+          ], { optional: true }),
+          query(':enter', [
+            style({ opacity: 0, transform: 'scale(1.05)' }),
+            animate('300ms ease-out', style({ opacity: 1, transform: 'scale(1)' }))
+          ], { optional: true })
+        ])
+      ]),
+      transition(':decrement', [
+        query(':enter, :leave', style({ position: 'absolute', width: '100%', height: '100%' }), { optional: true }),
+        group([
+          query(':leave', [
+            animate('300ms ease-out', style({ opacity: 0, transform: 'scale(1.05)' }))
+          ], { optional: true }),
+          query(':enter', [
+            style({ opacity: 0, transform: 'scale(0.95)' }),
+            animate('300ms ease-out', style({ opacity: 1, transform: 'scale(1)' }))
+          ], { optional: true })
+        ])
+      ])
+    ])
+  ]
 })
 export class PostPageComponent implements OnInit {
   post: Post | undefined;
@@ -27,6 +56,9 @@ export class PostPageComponent implements OnInit {
   // Comment editing state
   editingCommentId: string = '';
   editText: string = '';
+
+  // Media Carousel state
+  currentMediaIndex: number = 0;
 
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -42,6 +74,37 @@ export class PostPageComponent implements OnInit {
 
   get isDark() {
     return this.theme.isDark();
+  }
+
+  get mediaToDisplay(): string[] {
+    if (this.post?.mediaUrls && this.post.mediaUrls.length > 0) {
+      return this.post.mediaUrls;
+    }
+    return this.post?.image ? [this.post.image] : [];
+  }
+
+  isVideo(url: string): boolean {
+    if (!url) return false;
+    const lower = url.toLowerCase();
+    return lower.endsWith('.mp4') || lower.endsWith('.webm') || lower.endsWith('.ogg') || lower.endsWith('.mov');
+  }
+
+  nextMedia(): void {
+    if (this.currentMediaIndex < this.mediaToDisplay.length - 1) {
+      this.currentMediaIndex++;
+    } else {
+      this.currentMediaIndex = 0; // Loop back to start
+    }
+    this.cdr.detectChanges();
+  }
+
+  prevMedia(): void {
+    if (this.currentMediaIndex > 0) {
+      this.currentMediaIndex--;
+    } else {
+      this.currentMediaIndex = this.mediaToDisplay.length - 1; // Loop back to end
+    }
+    this.cdr.detectChanges();
   }
 
   ngOnInit(): void {

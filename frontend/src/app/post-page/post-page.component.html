@@ -31,9 +31,64 @@
 
     <h1 class="post-title">{{ post.title }}</h1>
 
-    <!-- 3. Hero Image -->
-    <div class="hero-image-wrapper">
-      <img [src]="post.image | imageUrl:'https://placehold.co/1200x600'" [alt]="post.title" class="hero-image">
+    <!-- 3. Media Carousel -->
+    <div class="media-carousel mb-8" *ngIf="mediaToDisplay.length > 0">
+      
+      <!-- Backdrop Blur Layer -->
+      <div class="backdrop-layer" *ngIf="!isVideo(mediaToDisplay[currentMediaIndex])">
+        <img [src]="mediaToDisplay[currentMediaIndex] | imageUrl:'https://placehold.co/1200x600'" 
+             class="backdrop-image">
+      </div>
+      <!-- Video Backdrop (optional, static or dark) -->
+      <div class="backdrop-layer bg-black" *ngIf="isVideo(mediaToDisplay[currentMediaIndex])"></div>
+
+      <!-- Current Media Item with Animation -->
+      <!-- The animation triggers when currentMediaIndex changes. 
+           ngFor ensures the element is destroyed/created for :enter/:leave animations -->
+      <div class="media-wrapper" [@carouselAnimation]="currentMediaIndex">
+        <ng-container *ngFor="let url of [mediaToDisplay[currentMediaIndex]]">
+          <div class="media-inner-container">
+            <ng-container *ngIf="isVideo(url); else imgTemplate">
+              <video [src]="url | imageUrl" 
+                     class="carousel-item shadow-2xl" controls preload="metadata"></video>
+            </ng-container>
+            <ng-template #imgTemplate>
+              <img [src]="url | imageUrl:'https://placehold.co/1200x600'" 
+                   [alt]="post.title" class="carousel-item shadow-2xl">
+            </ng-template>
+          </div>
+        </ng-container>
+      </div>
+
+      <!-- Navigation Arrows (only if multiple items) -->
+      <ng-container *ngIf="mediaToDisplay.length > 1">
+        <button (click)="prevMedia()" 
+                style="position: absolute; left: 1rem; top: 50%; z-index: 50; transform: translateY(-50%);"
+                class="bg-white/10 hover:bg-white/20 text-white p-3 rounded-full backdrop-blur-md transition shadow-lg cursor-pointer border-none group">
+          <mat-icon class="group-hover:-translate-x-0.5 transition-transform">chevron_left</mat-icon>
+        </button>
+        <button (click)="nextMedia()" 
+                style="position: absolute; right: 1rem; top: 50%; z-index: 50; transform: translateY(-50%);"
+                class="bg-white/10 hover:bg-white/20 text-white p-3 rounded-full backdrop-blur-md transition shadow-lg cursor-pointer border-none group">
+          <mat-icon class="group-hover:translate-x-0.5 transition-transform">chevron_right</mat-icon>
+        </button>
+        
+        <!-- Indicators -->
+        <div style="position: absolute; bottom: 1rem; left: 50%; transform: translateX(-50%); z-index: 50;" class="flex gap-2">
+          <button *ngFor="let item of mediaToDisplay; let i = index" 
+                  (click)="currentMediaIndex = i"
+                  class="w-2.5 h-2.5 rounded-full transition-all shadow-sm border-none p-0 cursor-pointer"
+                  [style.background-color]="i === currentMediaIndex ? 'white' : 'rgba(255,255,255,0.4)'"
+                  [style.transform]="i === currentMediaIndex ? 'scale(1.2)' : 'scale(1)'">
+          </button>
+        </div>
+
+        <!-- Counter -->
+        <div style="position: absolute; top: 1rem; right: 1rem; z-index: 50;" 
+             class="bg-black/50 text-white text-[10px] px-2 py-0.5 rounded backdrop-blur-sm font-sans uppercase tracking-wider">
+          {{ currentMediaIndex + 1 }} / {{ mediaToDisplay.length }}
+        </div>
+      </ng-container>
     </div>
 
     <!-- 4. Action Bar -->

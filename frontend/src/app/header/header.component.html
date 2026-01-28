@@ -48,7 +48,10 @@
                 <div class="dropdown-header">
                   <h3>Notifications</h3>
                   @if (unreadCount > 0) {
-                    <button (click)="markAllAsRead()" class="text-xs text-blue-500 hover:underline">Mark all read</button>
+                    <button (click)="markAllAsRead()" class="mark-read-btn">
+                      <mat-icon style="font-size: 16px; width: 16px; height: 16px;">done_all</mat-icon>
+                      Mark all read
+                    </button>
                   }
                 </div>
                 

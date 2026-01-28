@@ -1,23 +1,24 @@
 package com._blog.controller;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/media")
 @CrossOrigin(origins = "http://localhost:4200")
 public class MediaController {
 
-    private static final String UPLOAD_DIR = "uploads/";
+    private final Cloudinary cloudinary;
+
+    public MediaController(Cloudinary cloudinary) {
+        this.cloudinary = cloudinary;
+    }
 
     @PostMapping("/upload")
     public ResponseEntity<Map<String, String>> uploadFile(@RequestParam("file") MultipartFile file) {
@@ -26,37 +27,28 @@ public class MediaController {
         }
 
         try {
-            Path uploadPath = Paths.get(UPLOAD_DIR);
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
+            // Determine resource type based on file content type
+            String contentType = file.getContentType();
+            String resourceType = "auto";
+            
+            if (contentType != null) {
+                if (contentType.startsWith("image/")) {
+                    resourceType = "image";
+                } else if (contentType.startsWith("video/")) {
+                    resourceType = "video";
+                }
             }
 
-            String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-            Path path = uploadPath.resolve(fileName);
-            Files.copy(file.getInputStream(), path);
-
-            String fileUrl = "/api/media/files/" + fileName;
-            Map<String, String> response = new HashMap<>();
-            response.put("url", fileUrl);
-            return ResponseEntity.ok(response);
+            Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap(
+                "resource_type", resourceType
+            ));
+            
+            String url = (String) uploadResult.get("secure_url");
+            
+            return ResponseEntity.ok(Map.of("url", url));
 
         } catch (IOException e) {
             return ResponseEntity.status(500).body(Map.of("error", "Could not upload the file: " + e.getMessage()));
-        }
-    }
-
-    @GetMapping("/files/{filename:.+}")
-    public ResponseEntity<byte[]> getFile(@PathVariable String filename) {
-        try {
-            Path path = Paths.get(UPLOAD_DIR + filename);
-            byte[] data = Files.readAllBytes(path);
-            String contentType = Files.probeContentType(path);
-            
-            return ResponseEntity.ok()
-                    .header("Content-Type", contentType != null ? contentType : "application/octet-stream")
-                    .body(data);
-        } catch (IOException e) {
-            return ResponseEntity.notFound().build();
         }
     }
 }

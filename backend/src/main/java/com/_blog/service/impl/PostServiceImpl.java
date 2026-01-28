@@ -95,6 +95,7 @@ public class PostServiceImpl implements PostService {
         post.setExcerpt(request.excerpt());
         post.setCategory(request.category());
         post.setImage(request.image());
+        post.setMediaUrls(request.mediaUrls() != null ? request.mediaUrls() : new ArrayList<>());
         post.setDate(LocalDateTime.now());
         post.setAuthor(author);
         post.setContentList(request.content());
@@ -224,6 +225,9 @@ public class PostServiceImpl implements PostService {
         post.setExcerpt(request.excerpt());
         post.setCategory(request.category());
         post.setImage(request.image());
+        if (request.mediaUrls() != null) {
+            post.setMediaUrls(request.mediaUrls());
+        }
         post.setContentList(request.content());
 
         return postRepository.save(post);

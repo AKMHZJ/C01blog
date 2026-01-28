@@ -15,21 +15,52 @@
     <div class="editor-scroll-container">
       <div class="editor-content-wrapper">
         
-        <!-- Cover Image -->
-        <div class="cover-image-section">
-          <div *ngIf="image" class="image-preview relative group">
-            <img [src]="getFullImageUrl(image)" class="w-full h-64 object-cover rounded-lg shadow-sm">
-            <button class="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition"
-                    (click)="fileInput.click()">
-              <mat-icon>edit</mat-icon>
+        <!-- Media Gallery -->
+        <div class="media-section mb-8">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-bold opacity-60 uppercase tracking-wide">Media</h3>
+            <button (click)="fileInput.click()" class="btn-text text-sm flex items-center gap-1">
+              <mat-icon class="text-sm">add</mat-icon> Add Media
             </button>
+            <input type="file" (change)="onFileSelected($event)" accept="image/*,video/*" multiple class="hidden" #fileInput>
           </div>
-          
-          <div *ngIf="!image" class="upload-placeholder" (click)="fileInput.click()">
-            <mat-icon class="text-4xl opacity-40">add_photo_alternate</mat-icon>
-            <span class="mt-2 text-sm opacity-60">Add a cover image</span>
+
+          <!-- Media List -->
+          <div class="grid grid-cols-2 gap-4" *ngIf="mediaUrls.length > 0">
+            <div *ngFor="let url of mediaUrls; let i = index" class="relative group rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+              
+              <!-- Content -->
+              <ng-container *ngIf="isVideo(url); else imgTemplate">
+                <video [src]="getFullImageUrl(url)" class="w-full h-48 object-cover" controls></video>
+              </ng-container>
+              <ng-template #imgTemplate>
+                <img [src]="getFullImageUrl(url)" class="w-full h-48 object-cover">
+              </ng-template>
+
+              <!-- Overlay Actions -->
+              <div class="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button (click)="setAsCover(url)" *ngIf="!isVideo(url) && image !== url" 
+                        class="bg-black/60 hover:bg-black/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm"
+                        title="Set as cover">
+                  Set Cover
+                </button>
+                <span *ngIf="image === url" class="bg-green-600 text-white text-xs px-2 py-1 rounded backdrop-blur-sm">
+                  Cover
+                </span>
+                <button (click)="removeMedia(i)" 
+                        class="bg-red-600/80 hover:bg-red-600 text-white p-1 rounded-full backdrop-blur-sm"
+                        title="Remove">
+                  <mat-icon class="text-sm w-4 h-4 flex items-center justify-center">close</mat-icon>
+                </button>
+              </div>
+            </div>
           </div>
-          <input type="file" (change)="onFileSelected($event)" accept="image/*" class="hidden" #fileInput>
+
+          <!-- Placeholder if empty -->
+          <div *ngIf="mediaUrls.length === 0" class="upload-placeholder" (click)="fileInput.click()">
+            <mat-icon class="text-4xl opacity-40">perm_media</mat-icon>
+            <span class="mt-2 text-sm opacity-60">Add images or videos (Max 120MB total)</span>
+          </div>
         </div>
 
         <!-- Title -->

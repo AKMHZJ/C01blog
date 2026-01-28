@@ -34,6 +34,9 @@ public class Post {
     @ElementCollection
     private List<String> likes = new ArrayList<>();
 
+    @ElementCollection
+    private List<String> mediaUrls = new ArrayList<>();
+
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "post_id")
     @OrderBy("timestamp DESC")
@@ -54,6 +57,7 @@ public class Post {
         this.date = date;
         this.author = author;
         this.likes = likes != null ? likes : new ArrayList<>();
+        this.mediaUrls = new ArrayList<>();
         this.comments = comments != null ? comments : new ArrayList<>();
         this.hidden = false;
     }
@@ -87,6 +91,9 @@ public class Post {
 
     public List<String> getLikes() { return likes; }
     public void setLikes(List<String> likes) { this.likes = likes; }
+
+    public List<String> getMediaUrls() { return mediaUrls; }
+    public void setMediaUrls(List<String> mediaUrls) { this.mediaUrls = mediaUrls; }
 
     public List<Comment> getComments() { return comments; }
     public void setComments(List<Comment> comments) { this.comments = comments; }

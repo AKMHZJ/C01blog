@@ -4,6 +4,7 @@ export interface Post {
   excerpt: string;
   category: string;
   image: string;
+  mediaUrls?: string[];
   content: string[];
   author: any; // Replace with a proper User interface if available
   date: string;

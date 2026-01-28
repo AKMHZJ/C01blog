@@ -12,12 +12,13 @@ export class ImageUrlPipe implements PipeTransform {
       return fallback;
     }
 
-    if (url.startsWith('/api/media/files/')) {
-      return `${this.baseUrl}${url}`;
+    if (url.startsWith('http') || url.startsWith('https')) {
+      return url;
     }
 
-    if (url.startsWith('http')) {
-      return url;
+    // Fallback for legacy local files if any exist
+    if (url.startsWith('/api/media/files/')) {
+      return `${this.baseUrl}${url}`;
     }
 
     // Handle relative paths that might not start with /api

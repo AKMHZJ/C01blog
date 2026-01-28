@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Router } from '@angular/router';
@@ -23,6 +23,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   public theme = inject(ThemeService);
   private notificationService = inject(NotificationApiService);
+  private cdr = inject(ChangeDetectorRef);
 
   notifications: Notification[] = [];
   showNotifications = false;
@@ -62,6 +63,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.notificationService.getNotifications().subscribe({
       next: (data) => {
         this.notifications = data;
+        this.cdr.detectChanges();
       },
       error: (e) => console.error('Failed to load notifications', e)
     });
@@ -69,10 +71,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   toggleNotifications() {
     this.showNotifications = !this.showNotifications;
+    this.cdr.detectChanges();
   }
 
   closeNotifications() {
     this.showNotifications = false;
+    this.cdr.detectChanges();
   }
 
   markAsRead(n: Notification) {
@@ -80,6 +84,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.notificationService.markAsRead(n.id).subscribe({
         next: (updated) => {
           n.read = true;
+          this.cdr.detectChanges();
         }
       });
     }
@@ -87,6 +92,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     if (n.relatedId) {
       this.router.navigate(['/post', n.relatedId]);
       this.showNotifications = false;
+      this.cdr.detectChanges();
     }
   }
 
@@ -94,6 +100,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.notificationService.markAllAsRead().subscribe({
       next: () => {
         this.notifications.forEach(n => n.read = true);
+        this.cdr.detectChanges();
       }
     });
   }

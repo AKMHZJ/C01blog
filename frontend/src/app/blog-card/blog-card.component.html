@@ -2,7 +2,15 @@
   
   <!-- 1. Thumbnail Image (4:3, sharp) -->
   <div class="image-container">
-    <img [src]="image | imageUrl:'https://placehold.co/600x400'" [alt]="title" class="card-image" />
+    <ng-container *ngIf="isVideo(image); else imgTemplate">
+      <video [src]="image | imageUrl" class="card-image object-cover" muted loop onmouseover="this.play()" onmouseout="this.pause()"></video>
+      <div class="video-indicator absolute top-2 right-2 bg-black/60 text-white rounded-full p-1 backdrop-blur-sm">
+        <mat-icon style="font-size: 16px; width: 16px; height: 16px;">play_arrow</mat-icon>
+      </div>
+    </ng-container>
+    <ng-template #imgTemplate>
+      <img [src]="image | imageUrl:'https://placehold.co/600x400'" [alt]="title" class="card-image" />
+    </ng-template>
   </div>
 
   <!-- 2. Meta Row (Badge + Date) -->

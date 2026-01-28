@@ -14,5 +14,7 @@ public record PostRequest(
     
     String image, 
     
+    List<String> mediaUrls,
+
     List<String> content
 ) {}

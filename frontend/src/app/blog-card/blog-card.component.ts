@@ -26,6 +26,14 @@ export class BlogCardComponent {
 
   private dialog = inject(MatDialog);
 
+  isVideo(url: string): boolean {
+    if (!url) return false;
+    const lower = url.toLowerCase();
+    // Check against common video extensions or Cloudinary resource type 'video' in URL if applicable
+    // Simple extension check for now
+    return lower.endsWith('.mp4') || lower.endsWith('.webm') || lower.endsWith('.ogg') || lower.endsWith('.mov');
+  }
+
   openReport(event: Event) {
     event.stopPropagation();
     this.dialog.open(ReportDialogComponent, {
