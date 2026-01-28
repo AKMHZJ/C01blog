@@ -35,6 +35,7 @@
         <div class="error-msg" *ngIf="signupForm.get('username')?.invalid && signupForm.get('username')?.touched">
           <span *ngIf="signupForm.get('username')?.hasError('required')">Username is required.</span>
           <span *ngIf="signupForm.get('username')?.hasError('minlength')">Must be at least 3 characters.</span>
+          <span *ngIf="signupForm.get('username')?.hasError('pattern')">Only letters and numbers allowed.</span>
         </div>
       </div>
 
@@ -42,7 +43,8 @@
         <label>Display Name</label>
         <input formControlName="displayName" type="text" placeholder="Your Name" autocomplete="name" [class.error-border]="signupForm.get('displayName')?.invalid && signupForm.get('displayName')?.touched" />
         <div class="error-msg" *ngIf="signupForm.get('displayName')?.invalid && signupForm.get('displayName')?.touched">
-          <span>Display name is required.</span>
+          <span *ngIf="signupForm.get('displayName')?.hasError('required')">Display name is required.</span>
+          <span *ngIf="signupForm.get('displayName')?.hasError('pattern')">Only letters and numbers allowed.</span>
         </div>
       </div>
 

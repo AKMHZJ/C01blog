@@ -25,9 +25,9 @@ export class SignupComponent {
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
     this.signupForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      username: ['', [Validators.required, Validators.minLength(3)]],
+      username: ['', [Validators.required, Validators.minLength(3), Validators.pattern('^[a-zA-Z0-9]+$')]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      displayName: ['', [Validators.required]]
+      displayName: ['', [Validators.required, Validators.pattern('^[a-zA-Z0-9]+$')]]
     });
   }
 

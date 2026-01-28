@@ -3,6 +3,7 @@ package com._blog.dto;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 public class SignupRequest {
 
@@ -11,6 +12,7 @@ public class SignupRequest {
     private String email;
 
     @NotBlank(message = "Username is required")
+    @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "Username must contain only letters and numbers")
     private String username;
 
     // Accept both "password" and "pass" from frontend
@@ -18,6 +20,8 @@ public class SignupRequest {
     @NotBlank(message = "Password is required")
     private String password;
 
+    @NotBlank(message = "Display name is required")
+    @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "Display name must contain only letters and numbers")
     private String displayName;
 
     public SignupRequest() {}
