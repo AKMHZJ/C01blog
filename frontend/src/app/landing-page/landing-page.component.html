@@ -8,8 +8,8 @@
       </a>
 
       <div class="nav-actions">
-        <button (click)="toggleTheme()" class="theme-btn" [style.color]="theme.isDark() ? '#fff' : '#000'">
-          {{ theme.isDark() ? 'Light' : 'Dark' }}
+        <button (click)="toggleTheme()" class="icon-btn" title="Toggle theme">
+          <mat-icon>{{ theme.isDark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
         </button>
         <button (click)="onContinue()" class="btn-primary">
           Log In

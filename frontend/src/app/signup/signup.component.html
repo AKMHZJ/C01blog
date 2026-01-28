@@ -1,7 +1,7 @@
 <div class="auth-page" [ngClass]="isDark ? 'theme-dark' : 'theme-light'">
 
-  <button (click)="toggleTheme()" class="icon-btn" style="position: fixed; top: 2rem; right: 2rem; opacity: 0.6; font-size: 0.875rem;">
-    {{ isDark ? 'Light' : 'Dark' }}
+  <button (click)="toggleTheme()" class="icon-btn" style="position: fixed; top: 2rem; right: 2rem;">
+    <mat-icon>{{ isDark ? 'light_mode' : 'dark_mode' }}</mat-icon>
   </button>
 
   <div class="auth-container">
