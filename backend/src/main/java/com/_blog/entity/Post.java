@@ -37,8 +37,7 @@ public class Post {
     @ElementCollection
     private List<String> mediaUrls = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "post_id")
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "post")
     @OrderBy("timestamp DESC")
     private List<Comment> comments = new ArrayList<>();
 

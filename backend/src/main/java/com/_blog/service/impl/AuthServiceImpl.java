@@ -16,6 +16,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import com._blog.exception.BadRequestException;
+import com._blog.exception.ConflictException;
+
 @Service
 public class AuthServiceImpl implements AuthService {
 
@@ -44,16 +47,16 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public User registerUser(User user) throws Exception {
-        if (user == null) throw new Exception("Invalid signup request");
-        if (user.getUsername() == null || user.getUsername().trim().isEmpty()) throw new Exception("Username is required");
-        if (user.getEmail() == null || user.getEmail().trim().isEmpty()) throw new Exception("Email is required");
-        if (user.getPassword() == null || user.getPassword().trim().isEmpty()) throw new Exception("Password is required");
+        if (user == null) throw new BadRequestException("Invalid signup request");
+        if (user.getUsername() == null || user.getUsername().trim().isEmpty()) throw new BadRequestException("Username is required");
+        if (user.getEmail() == null || user.getEmail().trim().isEmpty()) throw new BadRequestException("Email is required");
+        if (user.getPassword() == null || user.getPassword().trim().isEmpty()) throw new BadRequestException("Password is required");
 
         if (userRepository.existsByUsername(user.getUsername())) {
-            throw new Exception("Username is already taken!");
+            throw new ConflictException("Username is already taken!");
         }
         if (userRepository.existsByEmail(user.getEmail())) {
-            throw new Exception("Email is already in use!");
+            throw new ConflictException("Email is already in use!");
         }
 
         user.setRole(Role.USER);
@@ -79,7 +82,7 @@ public class AuthServiceImpl implements AuthService {
         User user = userOpt.orElseThrow(() -> new Exception("Invalid credentials"));
 
         if (user.isBanned()) {
-            throw new Exception("Your account has been banned");
+            throw new com._blog.exception.BannedUserException("Your account has been banned.");
         }
 
         boolean match = encoder.matches(rawPassword, user.getPassword());

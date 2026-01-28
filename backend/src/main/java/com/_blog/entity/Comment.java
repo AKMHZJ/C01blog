@@ -18,6 +18,11 @@ public class Comment {
     @JoinColumn(name = "user_id")
     private User author;
 
+    @ManyToOne
+    @JoinColumn(name = "post_id")
+    @com.fasterxml.jackson.annotation.JsonIgnore // Prevent infinite recursion
+    private Post post;
+
     public Comment() {}
 
     public Comment(String id, String text, LocalDateTime timestamp, User author) {
@@ -38,4 +43,7 @@ public class Comment {
 
     public User getAuthor() { return author; }
     public void setAuthor(User author) { this.author = author; }
+
+    public Post getPost() { return post; }
+    public void setPost(Post post) { this.post = post; }
 }

@@ -7,6 +7,9 @@ import com._blog.entity.Comment;
 import com._blog.entity.Follow;
 import com._blog.entity.Post;
 import com._blog.entity.User;
+import com._blog.exception.BannedUserException;
+import com._blog.exception.ForbiddenException;
+import com._blog.exception.ResourceNotFoundException;
 import com._blog.repository.CommentRepository;
 import com._blog.repository.FollowRepository;
 import com._blog.repository.PostRepository;
@@ -42,6 +45,15 @@ public class PostServiceImpl implements PostService {
         this.notificationService = notificationService;
     }
 
+    private User getUser(UserDetails userDetails) {
+        User user = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        if (user.isBanned()) {
+            throw new BannedUserException("Your account has been banned.");
+        }
+        return user;
+    }
+
     @Override
     public org.springframework.data.domain.Page<Post> getAllPosts(int page, int size) {
         return postRepository.findAllByHiddenFalseOrderByDateDesc(PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "date")));
@@ -54,7 +66,7 @@ public class PostServiceImpl implements PostService {
         }
 
         User currentUser = userRepository.findByUsername(userDetails.getUsername()).orElse(null);
-        if (currentUser == null) {
+        if (currentUser == null || currentUser.isBanned()) {
             return org.springframework.data.domain.Page.empty();
         }
 
@@ -76,7 +88,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public Post getPost(String id) {
         return postRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
     }
 
     @Override
@@ -87,8 +99,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public Post createPost(PostRequest request, UserDetails userDetails) {
-        User author = userRepository.findByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User author = getUser(userDetails);
 
         Post post = new Post();
         post.setTitle(request.title());
@@ -110,9 +121,8 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public Post toggleLike(String id, UserDetails userDetails) {
-        Post post = postRepository.findById(id).orElseThrow();
-        User currentUser = userRepository.findByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+        User currentUser = getUser(userDetails);
 
         String currentUserId = String.valueOf(currentUser.getId());
 
@@ -128,35 +138,31 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public Comment addComment(String id, CommentRequest request, UserDetails userDetails) {
-        Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("Post not found"));
-        User author = userRepository.findByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+        User author = getUser(userDetails);
 
         Comment comment = new Comment();
         comment.setText(request.text());
         comment.setTimestamp(LocalDateTime.now());
         comment.setAuthor(author);
+        comment.setPost(post);
         
-        Comment savedComment = commentRepository.saveAndFlush(comment);
-        
-        post.getComments().add(savedComment);
-        postRepository.save(post);
-        
-        return savedComment;
+        return commentRepository.save(comment);
     }
 
     @Override
     @Transactional
     public void deletePost(String id, UserDetails userDetails) {
-        Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("Post not found"));
-        User currentUser = userRepository.findByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+        User currentUser = getUser(userDetails);
 
         boolean isAdmin = currentUser.getRole() != null && currentUser.getRole().name().equals("ADMIN");
         boolean isOwner = post.getAuthor() != null && post.getAuthor().getId().equals(currentUser.getId());
 
         if (!isAdmin && !isOwner) {
-            throw new RuntimeException("Not authorized to delete this post");
+            throw new ForbiddenException("Not authorized to delete this post");
         }
 
         postRepository.deleteById(id);
@@ -165,61 +171,58 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public void deleteComment(String postId, String commentId, UserDetails userDetails) {
-        Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found"));
-        User currentUser = userRepository.findByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        Comment target = commentRepository.findById(commentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
+        
+        // Ensure comment belongs to the post
+        if (target.getPost() == null || !target.getPost().getId().equals(postId)) {
+             throw new ResourceNotFoundException("Comment not found on this post");
+        }
 
-        Comment target = post.getComments().stream()
-                .filter(c -> c != null && commentId.equals(c.getId()))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Comment not found"));
+        User currentUser = getUser(userDetails);
+        Post post = target.getPost();
 
         boolean isAdmin = currentUser.getRole() != null && currentUser.getRole().name().equals("ADMIN");
         boolean isPostOwner = post.getAuthor() != null && post.getAuthor().getId().equals(currentUser.getId());
         boolean isCommentOwner = target.getAuthor() != null && target.getAuthor().getId().equals(currentUser.getId());
 
         if (!isAdmin && !isPostOwner && !isCommentOwner) {
-            throw new RuntimeException("Not authorized to delete this comment");
+            throw new ForbiddenException("Not authorized to delete this comment");
         }
 
-        post.getComments().remove(target);
-        postRepository.save(post);
+        commentRepository.delete(target);
     }
 
     @Override
     @Transactional
     public Comment updateComment(String postId, String commentId, CommentRequest request, UserDetails userDetails) {
-        // Fetch post first to manage collection context
-        Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found"));
-        
-        Comment comment = post.getComments().stream()
-                .filter(c -> c != null && commentId.equals(c.getId()))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Comment not found"));
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
 
-        User currentUser = userRepository.findByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (comment.getPost() == null || !comment.getPost().getId().equals(postId)) {
+             throw new ResourceNotFoundException("Comment not found on this post");
+        }
+
+        User currentUser = getUser(userDetails);
 
         if (comment.getAuthor() == null || !comment.getAuthor().getId().equals(currentUser.getId())) {
-            throw new RuntimeException("Not authorized to update this comment");
+            throw new ForbiddenException("Not authorized to update this comment");
         }
 
         comment.setText(request.text());
-        // Save the post - this cascades to comments and handles orphaned management properly
-        postRepository.save(post);
-        return comment;
+        return commentRepository.save(comment);
     }
 
     @Override
     @Transactional
     public Post updatePost(String id, PostRequest request, UserDetails userDetails) {
-        Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("Post not found"));
-        User currentUser = userRepository.findByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+        User currentUser = getUser(userDetails);
 
         boolean isAdmin = currentUser.getRole() != null && currentUser.getRole().name().equals("ADMIN");
         boolean isOwner = post.getAuthor() != null && post.getAuthor().getId().equals(currentUser.getId());
-        if (!isAdmin && !isOwner) throw new RuntimeException("Not authorized to edit this post");
+        if (!isAdmin && !isOwner) throw new ForbiddenException("Not authorized to edit this post");
 
         post.setTitle(request.title());
         post.setExcerpt(request.excerpt());
@@ -232,19 +235,19 @@ public class PostServiceImpl implements PostService {
 
         return postRepository.save(post);
     }
-            @Override
-            @Transactional
-            public Post toggleHide(String id, UserDetails userDetails) {
-                Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("Post not found"));
-                User currentUser = userRepository.findByUsername(userDetails.getUsername())
-                        .orElseThrow(() -> new RuntimeException("User not found"));
-        
-                if (!currentUser.getRole().name().equals("ADMIN")) {
-                    throw new RuntimeException("Not authorized to hide/unhide posts");
-                }
-        
-                post.setHidden(!post.isHidden());
-                return postRepository.save(post);
-            }
+
+    @Override
+    @Transactional
+    public Post toggleHide(String id, UserDetails userDetails) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+        User currentUser = getUser(userDetails);
+
+        if (!currentUser.getRole().name().equals("ADMIN")) {
+            throw new ForbiddenException("Not authorized to hide/unhide posts");
         }
-        
+
+        post.setHidden(!post.isHidden());
+        return postRepository.save(post);
+    }
+}

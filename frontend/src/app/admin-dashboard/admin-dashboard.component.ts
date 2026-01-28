@@ -5,6 +5,7 @@ import { AdminService } from '../services/admin.service';
 import { ReportService } from '../services/report.service';
 import { PostService } from '../services/post.service';
 import { ThemeService } from '../services/theme.service';
+import { AuthService } from '../services/auth.service';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
@@ -32,11 +33,19 @@ export class AdminDashboardComponent implements OnInit {
   private postService = inject(PostService);
   private reportService = inject(ReportService);
   public theme = inject(ThemeService);
+  private authService = inject(AuthService);
   private cdr = inject(ChangeDetectorRef);
 
   get isDark() {
     return this.theme.isDark();
   }
+
+  get currentUser() {
+    return this.authService.currentUser();
+  }
+
+  // Helper for template
+  String = String;
 
   constructor() {}
 
@@ -120,24 +129,6 @@ export class AdminDashboardComponent implements OnInit {
 
   cancelConfirm() {
     this.confirmationData = null;
-  }
-
-  updateRole(u: any, role: 'USER' | 'ADMIN') {
-    this.openConfirm(`Change role of ${u.username} to ${role}?`, () => {
-      const prev = u.role;
-      u.role = role;
-      this.admin.updateUserRole(String(u.id), role).subscribe({
-        next: () => {
-          this.cdr.detectChanges();
-        },
-        error: (e) => {
-          console.error(e);
-          u.role = prev;
-          this.error = 'Role update failed';
-          this.cdr.detectChanges();
-        }
-      });
-    });
   }
 
   toggleBan(u: any) {

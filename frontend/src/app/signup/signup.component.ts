@@ -33,7 +33,8 @@ export class SignupComponent {
 
   handleSubmit() {
     if (this.signupForm.invalid) {
-      this.notificationService.showError('Please fix the errors in the form');
+      this.signupForm.markAllAsTouched();
+      this.notificationService.showError('Please check the form for errors.');
       return;
     }
 

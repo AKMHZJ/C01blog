@@ -20,10 +20,6 @@ export class AdminService {
     return this.http.get<any[]>(`${this.apiUrl}/posts`);
   }
 
-  updateUserRole(userId: string, role: 'USER' | 'ADMIN'): Observable<any> {
-    return this.http.put(`${this.apiUrl}/users/${userId}/role`, { role });
-  }
-
   banUser(userId: string, banned: boolean): Observable<any> {
     return this.http.put(`${this.apiUrl}/users/${userId}/ban`, { banned });
   }

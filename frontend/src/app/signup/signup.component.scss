@@ -93,6 +93,17 @@
     &::placeholder {
       opacity: 0.4;
     }
+    
+    &.error-border {
+      border-bottom-color: #ef4444;
+    }
+  }
+  
+  .error-msg {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    color: #ef4444;
+    animation: fadeIn 0.2s ease-out;
   }
 }
 

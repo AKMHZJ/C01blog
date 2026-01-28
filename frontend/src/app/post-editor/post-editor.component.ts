@@ -195,11 +195,17 @@ export class PostEditorComponent {
     const plainText = this.content.replace(/[#*`_]/g, ''); // Simple markdown strip
     const generatedExcerpt = plainText.length > 150 ? plainText.substring(0, 147) + '...' : plainText;
 
+    if (!this.title.trim() || !this.category.trim() || !this.content.trim()) {
+      this.notificationService.showError('Title, Category, and Content are required.');
+      return;
+    }
+
     const payload = {
       title: this.title,
       excerpt: generatedExcerpt,
       category: this.category,
-      image: this.image || (this.mediaUrls.length > 0 ? this.mediaUrls[0] : 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1080'),
+      // No fallback image anymore
+      image: this.image || (this.mediaUrls.length > 0 ? this.mediaUrls[0] : ''),
       mediaUrls: this.mediaUrls,
       content: this.content.split('\n\n').filter(p => p.trim()),
     };
