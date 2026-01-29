@@ -29,3 +29,13 @@
 - [ ] Implement a full "Profile Edit" page for users to change avatars/bios.
 - [ ] Add a "Forgot Password" email flow.
 - [ ] Use a cloud provider (S3/Cloudinary) for media storage in production.
+
+
+# when hide a post hide it from all users include the author and not let any action to pass(like, comment or edit or delete).
+# add validation for email with regex to hanle .com for example
+# delete comment change alert with toat notification
+# when navigate into a route does not exist or add some id not found in the route should show tosta message or page not found.
+
+
+
+# when a user navigate into admin routes do a toast with unautorized not logout 

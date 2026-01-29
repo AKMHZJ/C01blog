@@ -15,7 +15,7 @@
 
   <!-- 2. Meta Row (Badge + Date) -->
   <div class="meta-row">
-    <span class="category-badge">{{ category }}</span>
+    <span class="category-badge" [style.background]="hidden ? '#ef4444' : ''">{{ hidden ? 'HIDDEN' : category }}</span>
     <span class="date-text">{{ date | date }}</span>
   </div>
 

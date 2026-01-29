@@ -6,6 +6,7 @@ import { PostService } from '../services/post.service';
 import { AuthService } from '../services/auth.service';
 import { ThemeService } from '../services/theme.service';
 import { Post, Comment } from '../models/post';
+import { NotificationService } from '../services/notification.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ImageUrlPipe } from '../pipes/image-url.pipe';
@@ -65,6 +66,7 @@ export class PostPageComponent implements OnInit {
   public authService = inject(AuthService);
   private postService = inject(PostService);
   public theme = inject(ThemeService);
+  private notificationService = inject(NotificationService);
   private cdr = inject(ChangeDetectorRef);
   private dialog = inject(MatDialog);
 
@@ -110,12 +112,19 @@ export class PostPageComponent implements OnInit {
   ngOnInit(): void {
     const postId = this.route.snapshot.paramMap.get('id');
     if (postId) {
-      this.postService.getPost(postId).subscribe(post => {
-        setTimeout(() => {
-          this.post = post;
-          this.checkInteractionStates();
-          this.cdr.detectChanges();
-        }, 0);
+      this.postService.getPost(postId).subscribe({
+        next: (post) => {
+          setTimeout(() => {
+            this.post = post;
+            this.checkInteractionStates();
+            this.cdr.detectChanges();
+          }, 0);
+        },
+        error: (err) => {
+          console.error('Post not found:', err);
+          this.notificationService.showError('Post not found');
+          this.router.navigate(['/404']);
+        }
       });
     }
   }
@@ -199,6 +208,7 @@ export class PostPageComponent implements OnInit {
             if (idx !== -1) {
               this.post.comments[idx] = updatedComment;
               console.log('[PostPage] Comment updated in local state');
+              this.notificationService.showSuccess('Comment updated');
             }
           }
           this.cancelEdit();
@@ -207,7 +217,7 @@ export class PostPageComponent implements OnInit {
       },
       error: (err) => {
         console.error('[PostPage] Failed to update comment:', err);
-        alert('Could not update comment: ' + (err.error?.message || 'Server error'));
+        this.notificationService.showError('Could not update comment: ' + (err.error?.message || 'Server error'));
       }
     });
   }
@@ -226,13 +236,14 @@ export class PostPageComponent implements OnInit {
             if (this.post) {
               this.post.comments = this.post.comments.filter(c => c.id !== commentId);
               console.log('[PostPage] Comment removed from local state');
+              this.notificationService.showSuccess('Comment deleted');
             }
             this.cdr.detectChanges();
           }, 0);
         },
         error: (err) => {
           console.error('[PostPage] Failed to delete comment:', err);
-          alert('Could not delete comment: ' + (err.error?.message || 'Server error'));
+          this.notificationService.showError('Could not delete comment: ' + (err.error?.message || 'Server error'));
         }
       });
     }

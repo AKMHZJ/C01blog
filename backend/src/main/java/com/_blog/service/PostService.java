@@ -13,8 +13,8 @@ import java.util.List;
 public interface PostService {
     Page<Post> getAllPosts(int page, int size);
     Page<Post> getFeed(UserDetails userDetails, int page, int size);
-    Post getPost(String id);
-    List<Post> getUserPosts(Long userId);
+    Post getPost(String id, UserDetails userDetails);
+    List<Post> getUserPosts(Long userId, UserDetails userDetails);
     
     Post createPost(PostRequest request, UserDetails userDetails);
     

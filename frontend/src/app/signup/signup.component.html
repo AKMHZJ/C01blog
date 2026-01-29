@@ -26,6 +26,7 @@
         <div class="error-msg" *ngIf="signupForm.get('email')?.invalid && signupForm.get('email')?.touched">
           <span *ngIf="signupForm.get('email')?.hasError('required')">Email is required.</span>
           <span *ngIf="signupForm.get('email')?.hasError('email')">Please enter a valid email.</span>
+          <span *ngIf="signupForm.get('email')?.hasError('pattern')">Email must end with .com.</span>
         </div>
       </div>
 

@@ -9,6 +9,7 @@ import { DiscoverPageComponent } from './discover-page/discover_component_ts';
 import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
 import { AboutPageComponent } from './about-page/about-page.component';
 import { adminGuard } from './guards/admin.guard';
+import { NotFoundComponent } from './not-found/not-found.component';
 
 export const routes: Routes = [
   { path: '', component: LandingPageComponent },
@@ -20,5 +21,6 @@ export const routes: Routes = [
   { path: 'about', component: AboutPageComponent },
   { path: 'dashboard', component: AdminDashboardComponent, canActivate: [adminGuard] },
   { path: 'post/:id', component: PostPageComponent },
-  { path: '**', redirectTo: '' }, // Redirect unknown paths to home
+  { path: '404', component: NotFoundComponent },
+  { path: '**', component: NotFoundComponent },
 ];

@@ -9,6 +9,8 @@ import java.util.List;
 public interface PostRepository extends JpaRepository<Post, String> {
     // Custom query to find posts by a specific user (for "My Blog" page)
     List<Post> findByAuthorIdOrderByDateDesc(Long userId);
+
+    List<Post> findByAuthorIdAndHiddenFalseOrderByDateDesc(Long userId);
     
     // Find posts authored by any of the given author ids
     Page<Post> findByAuthorIdIn(List<Long> userIds, Pageable pageable);
