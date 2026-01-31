@@ -22,6 +22,7 @@ export class BlogCardComponent {
   @Input() author: any = null;
   @Input() likeCount: number = 0;
   @Input() commentCount: number = 0;
+  @Input() hidden: boolean = false;
   @Output() cardClick = new EventEmitter<void>();
 
   private dialog = inject(MatDialog);

@@ -66,9 +66,9 @@ export class PostPageComponent implements OnInit {
   public authService = inject(AuthService);
   private postService = inject(PostService);
   public theme = inject(ThemeService);
+  private notificationService = inject(NotificationService);
   private cdr = inject(ChangeDetectorRef);
   private dialog = inject(MatDialog);
-  private notificationService = inject(NotificationService);
 
   get currentUser() {
     return this.authService.currentUser();
@@ -121,7 +121,8 @@ export class PostPageComponent implements OnInit {
           }, 0);
         },
         error: (err) => {
-          console.error('Post not found or error:', err);
+          console.error('Post not found:', err);
+          this.notificationService.showError('Post not found');
           this.router.navigate(['/404']);
         }
       });

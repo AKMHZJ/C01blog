@@ -29,7 +29,10 @@
       </button>
     </div>
 
-    <h1 class="post-title">{{ post.title }}</h1>
+    <h1 class="post-title">
+      <span *ngIf="post.hidden" style="color: #ef4444; font-size: 0.6em; vertical-align: middle; border: 1px solid #ef4444; padding: 2px 6px; border-radius: 4px; margin-right: 8px;">HIDDEN</span>
+      {{ post.title }}
+    </h1>
 
     <!-- 3. Media Carousel -->
     <div class="media-carousel mb-8" *ngIf="mediaToDisplay.length > 0">
@@ -93,7 +96,7 @@
 
     <!-- 4. Action Bar -->
     <div class="action-bar">
-      <button (click)="handleLike()" class="action-item" [class.active]="isLiked">
+      <button (click)="handleLike()" class="action-item" [class.active]="isLiked" [disabled]="post.hidden || false" [style.opacity]="post.hidden ? 0.5 : 1">
         <mat-icon>{{ isLiked ? 'favorite' : 'favorite_border' }}</mat-icon>
         <span>{{ post.likes.length || 0 }}</span>
       </button>
@@ -112,7 +115,7 @@
     <section class="comment-section">
       <h3 class="comments-header">Comments ({{ post.comments.length || 0 }})</h3>
 
-      <div *ngIf="currentUser" class="comment-form-wrapper">
+      <div *ngIf="currentUser && !post.hidden" class="comment-form-wrapper">
         <form (ngSubmit)="handleCommentSubmit()">
           <textarea [(ngModel)]="commentText" name="commentText" rows="3" class="comment-input" placeholder="Write a comment..."></textarea>
           <div class="form-actions">

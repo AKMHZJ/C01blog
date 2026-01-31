@@ -40,8 +40,8 @@ public class PostController {
     }
 
     @GetMapping("/user/{userId}")
-    public List<Post> getUserPosts(@PathVariable Long userId) {
-        return postService.getUserPosts(userId);
+    public List<Post> getUserPosts(@PathVariable Long userId, @AuthenticationPrincipal UserDetails userDetails) {
+        return postService.getUserPosts(userId, userDetails);
     }
 
     @PostMapping

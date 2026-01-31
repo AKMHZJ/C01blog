@@ -74,14 +74,15 @@
           [author]="post.author"
           [likeCount]="post.likes.length"
           [commentCount]="post.comments.length"
+          [hidden]="post.hidden || false"
           (cardClick)="openEditor(post)">
         </app-blog-card>
         
         <div class="card-actions">
-          <button (click)="handleEdit(post, $event)" class="action-btn">
+          <button (click)="handleEdit(post, $event)" class="action-btn" [disabled]="post.hidden || false" [style.opacity]="post.hidden ? 0.5 : 1">
             <mat-icon style="font-size: 16px; width: 16px; height: 16px;">edit</mat-icon> Edit
           </button>
-          <button (click)="handleDelete(post.id, $event)" class="action-btn delete">
+          <button (click)="handleDelete(post.id, $event)" class="action-btn delete" [disabled]="post.hidden || false" [style.opacity]="post.hidden ? 0.5 : 1">
             <mat-icon style="font-size: 16px; width: 16px; height: 16px;">delete</mat-icon> Delete
           </button>
         </div>
