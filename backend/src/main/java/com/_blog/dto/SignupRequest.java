@@ -9,6 +9,7 @@ public class SignupRequest {
 
     @NotBlank(message = "Email is required")
     @Email(message = "Email is invalid")
+    @Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.com$", message = "Email must end with .com")
     private String email;
 
     @NotBlank(message = "Username is required")

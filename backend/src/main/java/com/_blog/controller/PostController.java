@@ -35,8 +35,8 @@ public class PostController {
     }
 
     @GetMapping("/{id}")
-    public Post getPost(@PathVariable String id) {
-        return postService.getPost(id);
+    public Post getPost(@PathVariable String id, @AuthenticationPrincipal UserDetails userDetails) {
+        return postService.getPost(id, userDetails);
     }
 
     @GetMapping("/user/{userId}")

@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { PostService } from '../services/post.service';
 import { AuthService } from '../services/auth.service';
 import { ThemeService } from '../services/theme.service';
+import { NotificationService } from '../services/notification.service';
 import { Post, Comment } from '../models/post';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -67,6 +68,7 @@ export class PostPageComponent implements OnInit {
   public theme = inject(ThemeService);
   private cdr = inject(ChangeDetectorRef);
   private dialog = inject(MatDialog);
+  private notificationService = inject(NotificationService);
 
   get currentUser() {
     return this.authService.currentUser();
@@ -110,12 +112,18 @@ export class PostPageComponent implements OnInit {
   ngOnInit(): void {
     const postId = this.route.snapshot.paramMap.get('id');
     if (postId) {
-      this.postService.getPost(postId).subscribe(post => {
-        setTimeout(() => {
-          this.post = post;
-          this.checkInteractionStates();
-          this.cdr.detectChanges();
-        }, 0);
+      this.postService.getPost(postId).subscribe({
+        next: (post) => {
+          setTimeout(() => {
+            this.post = post;
+            this.checkInteractionStates();
+            this.cdr.detectChanges();
+          }, 0);
+        },
+        error: (err) => {
+          console.error('Post not found or error:', err);
+          this.router.navigate(['/404']);
+        }
       });
     }
   }
@@ -140,13 +148,19 @@ export class PostPageComponent implements OnInit {
 
   openReport(): void {
     if (!this.post) return;
-    this.dialog.open(ReportDialogComponent, {
+    const dialogRef = this.dialog.open(ReportDialogComponent, {
       data: { 
         postId: this.post.id, 
         postTitle: this.post.title,
         postAuthor: this.post.author?.username || 'Unknown'
       },
       width: '500px'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.notificationService.showSuccess('Report submitted');
+      }
     });
   }
 
@@ -202,12 +216,13 @@ export class PostPageComponent implements OnInit {
             }
           }
           this.cancelEdit();
+          this.notificationService.showSuccess('Comment updated');
           this.cdr.detectChanges();
         }, 0);
       },
       error: (err) => {
         console.error('[PostPage] Failed to update comment:', err);
-        alert('Could not update comment: ' + (err.error?.message || 'Server error'));
+        this.notificationService.showError('Could not update comment: ' + (err.error?.message || 'Server error'));
       }
     });
   }
@@ -227,12 +242,13 @@ export class PostPageComponent implements OnInit {
               this.post.comments = this.post.comments.filter(c => c.id !== commentId);
               console.log('[PostPage] Comment removed from local state');
             }
+            this.notificationService.showSuccess('Comment deleted');
             this.cdr.detectChanges();
           }, 0);
         },
         error: (err) => {
           console.error('[PostPage] Failed to delete comment:', err);
-          alert('Could not delete comment: ' + (err.error?.message || 'Server error'));
+          this.notificationService.showError('Could not delete comment: ' + (err.error?.message || 'Server error'));
         }
       });
     }

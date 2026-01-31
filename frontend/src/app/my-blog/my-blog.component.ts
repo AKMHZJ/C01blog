@@ -193,9 +193,14 @@ export class MyBlogComponent implements OnInit {
   handleDelete(postId: string, event: Event) {
     event.stopPropagation();
     if (confirm('Are you sure you want to delete this post?')) {
-      this.postService.deletePost(postId).subscribe(() => {
-        this.loadUserPosts(this.user?.id || '1');
-        this.notificationService.showSuccess('Post deleted');
+      this.postService.deletePost(postId).subscribe({
+        next: () => {
+          this.loadUserPosts(this.user?.id || '1');
+          this.notificationService.showSuccess('Post deleted');
+        },
+        error: (err) => {
+          this.notificationService.showError('Failed to delete post');
+        }
       });
     }
   }

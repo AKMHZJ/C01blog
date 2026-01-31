@@ -7,6 +7,7 @@ import { BlogCardComponent } from '../blog-card/blog-card.component';
 import { PostService } from '../services/post.service';
 import { AuthService } from '../services/auth.service';
 import { ThemeService } from '../services/theme.service';
+import { NotificationService } from '../services/notification.service';
 import { Post } from '../models/post';
 
 @Component({
@@ -32,6 +33,7 @@ export class HomeComponent implements OnInit {
   private theme = inject(ThemeService);
   private route = inject(ActivatedRoute);
   private cdr = inject(ChangeDetectorRef);
+  private notificationService = inject(NotificationService);
 
   // Create observable in injection context (field initializer)
   private loggedIn$ = toObservable(this.authService.loggedIn);
@@ -49,7 +51,26 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit() {
-    // React to both query params AND auth state changes
+    // 1. Handle unauthorized error toast independently
+    this.route.queryParamMap.subscribe(params => {
+      if (params.get('error') === 'unauthorized') {
+        // Show the toast
+        this.notificationService.showError('Unauthorized access: Admin privileges required.');
+        
+        // Clear the query param so it doesn't show again on reload
+        // Use setTimeout to ensure navigation happens after current change detection cycle
+        setTimeout(() => {
+          this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { error: null },
+            queryParamsHandling: 'merge',
+            replaceUrl: true
+          });
+        }, 100);
+      }
+    });
+
+    // 2. React to query params and auth state for feed loading
     combineLatest([this.route.queryParamMap, this.loggedIn$]).subscribe(([params, isLoggedIn]) => {
       this.showEmptyRequested = params.has('showEmpty');
       this.loadFeed(isLoggedIn);

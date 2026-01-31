@@ -86,14 +86,25 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Post getPost(String id) {
-        return postRepository.findById(id)
+    public Post getPost(String id, UserDetails userDetails) {
+        Post post = postRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+        
+        if (post.isHidden()) {
+            if (userDetails != null) {
+                User currentUser = userRepository.findByUsername(userDetails.getUsername()).orElse(null);
+                if (currentUser != null && currentUser.getRole() != null && currentUser.getRole().name().equals("ADMIN")) {
+                    return post;
+                }
+            }
+            throw new ResourceNotFoundException("Post not found");
+        }
+        return post;
     }
 
     @Override
     public List<Post> getUserPosts(Long userId) {
-        return postRepository.findByAuthorIdOrderByDateDesc(userId);
+        return postRepository.findByAuthorIdAndHiddenFalseOrderByDateDesc(userId);
     }
 
     @Override
@@ -122,6 +133,11 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public Post toggleLike(String id, UserDetails userDetails) {
         Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+        
+        if (post.isHidden()) {
+             throw new ForbiddenException("Cannot perform action on hidden post");
+        }
+
         User currentUser = getUser(userDetails);
 
         String currentUserId = String.valueOf(currentUser.getId());
@@ -140,6 +156,11 @@ public class PostServiceImpl implements PostService {
     public Comment addComment(String id, CommentRequest request, UserDetails userDetails) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+        
+        if (post.isHidden()) {
+             throw new ForbiddenException("Cannot perform action on hidden post");
+        }
+
         User author = getUser(userDetails);
 
         Comment comment = new Comment();
@@ -159,6 +180,11 @@ public class PostServiceImpl implements PostService {
         User currentUser = getUser(userDetails);
 
         boolean isAdmin = currentUser.getRole() != null && currentUser.getRole().name().equals("ADMIN");
+        
+        if (post.isHidden() && !isAdmin) {
+             throw new ForbiddenException("Cannot perform action on hidden post");
+        }
+
         boolean isOwner = post.getAuthor() != null && post.getAuthor().getId().equals(currentUser.getId());
 
         if (!isAdmin && !isOwner) {
@@ -177,6 +203,14 @@ public class PostServiceImpl implements PostService {
         // Ensure comment belongs to the post
         if (target.getPost() == null || !target.getPost().getId().equals(postId)) {
              throw new ResourceNotFoundException("Comment not found on this post");
+        }
+        
+        if (target.getPost().isHidden()) {
+             User currentUser = getUser(userDetails);
+             boolean isAdmin = currentUser.getRole() != null && currentUser.getRole().name().equals("ADMIN");
+             if (!isAdmin) {
+                 throw new ForbiddenException("Cannot perform action on hidden post");
+             }
         }
 
         User currentUser = getUser(userDetails);
@@ -202,6 +236,10 @@ public class PostServiceImpl implements PostService {
         if (comment.getPost() == null || !comment.getPost().getId().equals(postId)) {
              throw new ResourceNotFoundException("Comment not found on this post");
         }
+        
+        if (comment.getPost().isHidden()) {
+             throw new ForbiddenException("Cannot perform action on hidden post");
+        }
 
         User currentUser = getUser(userDetails);
 
@@ -221,6 +259,11 @@ public class PostServiceImpl implements PostService {
         User currentUser = getUser(userDetails);
 
         boolean isAdmin = currentUser.getRole() != null && currentUser.getRole().name().equals("ADMIN");
+        
+        if (post.isHidden() && !isAdmin) {
+             throw new ForbiddenException("Cannot perform action on hidden post");
+        }
+
         boolean isOwner = post.getAuthor() != null && post.getAuthor().getId().equals(currentUser.getId());
         if (!isAdmin && !isOwner) throw new ForbiddenException("Not authorized to edit this post");
 
