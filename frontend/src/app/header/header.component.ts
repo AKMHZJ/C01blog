@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, NavigationEnd } from '@angular/router';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../services/auth.service';
@@ -10,6 +10,7 @@ import { Notification } from '../models/notification';
 
 import { ImageUrlPipe } from '../pipes/image-url.pipe';
 import { interval, Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-header',
@@ -28,6 +29,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   notifications: Notification[] = [];
   showNotifications = false;
   pollingSub: Subscription | null = null;
+  routerSub: Subscription | null = null;
 
   get user() {
     return this.authService.currentUser();
@@ -50,12 +52,24 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.loadNotifications();
       // Poll every 30 seconds
       this.pollingSub = interval(30000).subscribe(() => this.loadNotifications());
+
+      // Refresh notifications when navigating to /feed
+      this.routerSub = this.router.events.pipe(
+        filter(event => event instanceof NavigationEnd)
+      ).subscribe((event: any) => {
+        if (event.urlAfterRedirects && event.urlAfterRedirects.includes('/feed')) {
+          this.loadNotifications();
+        }
+      });
     }
   }
 
   ngOnDestroy() {
     if (this.pollingSub) {
       this.pollingSub.unsubscribe();
+    }
+    if (this.routerSub) {
+      this.routerSub.unsubscribe();
     }
   }
 
@@ -116,11 +130,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   onLogoClick(event: Event) {
     event.preventDefault();
     if (this.user) {
-      if (this.router.url === '/feed') {
-        window.location.reload();
-      } else {
-        this.router.navigate(['/feed']);
-      }
+      // Router is configured with onSameUrlNavigation: 'reload'
+      this.router.navigate(['/feed']);
     } else {
       this.router.navigate(['/']);
     }

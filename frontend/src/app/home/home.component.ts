@@ -1,8 +1,9 @@
-import { Component, OnInit, inject, ChangeDetectorRef, HostListener } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, HostListener, OnDestroy } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
-import { Router, ActivatedRoute } from '@angular/router';
-import { combineLatest } from 'rxjs';
+import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
+import { combineLatest, Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 import { BlogCardComponent } from '../blog-card/blog-card.component';
 import { PostService } from '../services/post.service';
 import { AuthService } from '../services/auth.service';
@@ -17,7 +18,7 @@ import { Post } from '../models/post';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
   feedPosts: Post[] = [];
   feedLoaded = false;
   showEmptyRequested = false;
@@ -26,6 +27,8 @@ export class HomeComponent implements OnInit {
   size = 5;
   hasMore = true;
   isLoading = false;
+  
+  private navSub: Subscription | null = null;
 
   private router = inject(Router);
   private postService = inject(PostService);
@@ -58,7 +61,6 @@ export class HomeComponent implements OnInit {
         this.notificationService.showError('Unauthorized access: Admin privileges required.');
         
         // Clear the query param so it doesn't show again on reload
-        // Use setTimeout to ensure navigation happens after current change detection cycle
         setTimeout(() => {
           this.router.navigate([], {
             relativeTo: this.route,
@@ -75,6 +77,19 @@ export class HomeComponent implements OnInit {
       this.showEmptyRequested = params.has('showEmpty');
       this.loadFeed(isLoggedIn);
     });
+    
+    // 3. Listen for navigation events (reload on same URL)
+    this.navSub = this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+       if (this.authService.isLoggedIn()) {
+         this.loadFeed(true);
+       }
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.navSub) this.navSub.unsubscribe();
   }
 
   loadFeed(isLoggedIn: boolean) {

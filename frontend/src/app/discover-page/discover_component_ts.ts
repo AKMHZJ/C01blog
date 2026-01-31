@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, Inject, PLATFORM_ID, inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, Inject, PLATFORM_ID, inject, OnDestroy } from '@angular/core';
 import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -6,6 +6,8 @@ import { UserService, UserSummary } from '../services/user.service';
 import { ThemeService } from '../services/theme.service';
 import { ImageUrlPipe } from '../pipes/image-url.pipe';
 import { AuthService } from '../services/auth.service';
+import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-discover-page',
@@ -14,10 +16,11 @@ import { AuthService } from '../services/auth.service';
   templateUrl: './discover_component_html.html',
   styleUrls: ['./discover_component_css.scss']
 })
-export class DiscoverPageComponent implements OnInit {
+export class DiscoverPageComponent implements OnInit, OnDestroy {
   users: UserSummary[] = [];
   subscriptions: string[] = [];
   currentUserId: string = '';
+  private navSub: Subscription | null = null;
 
   private router = inject(Router);
   private userService = inject(UserService);
@@ -32,12 +35,10 @@ export class DiscoverPageComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.router.events.subscribe(ev => {
-      if (ev instanceof NavigationEnd) {
-        if (ev.urlAfterRedirects && ev.urlAfterRedirects.indexOf('/discover') !== -1) {
-          this.loadData();
-        }
-      }
+    this.navSub = this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+        this.loadData();
     });
 
     const user = this.authService.currentUser();
@@ -46,6 +47,10 @@ export class DiscoverPageComponent implements OnInit {
     }
 
     this.loadData();
+  }
+
+  ngOnDestroy() {
+    if (this.navSub) this.navSub.unsubscribe();
   }
 
   loadData() {

@@ -1,7 +1,7 @@
-import { Component, OnInit, inject, effect, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, effect, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { BlogCardComponent } from '../../app/blog-card/blog-card.component';
 import { AuthService } from '../services/auth.service';
 import { PostService } from '../services/post.service';
@@ -11,6 +11,8 @@ import { Post } from '../models/post';
 import { ThemeService } from '../services/theme.service';
 import { PostEditorComponent } from '../post-editor/post-editor.component';
 import { MatIconModule } from '@angular/material/icon';
+import { filter } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 import { ImageUrlPipe } from '../pipes/image-url.pipe';
 
@@ -21,11 +23,12 @@ import { ImageUrlPipe } from '../pipes/image-url.pipe';
   templateUrl: './my-blog.component.html',
   styleUrls: ['./my-blog.component.scss'],
 })
-export class MyBlogComponent implements OnInit {
+export class MyBlogComponent implements OnInit, OnDestroy {
   myPosts: Post[] = [];
   showPostEditor = false;
   editingPost: Post | null = null;
   isLoading = false; 
+  private navSub: Subscription | null = null;
 
   // Profile editing state
   showProfileEditor = false;
@@ -69,7 +72,20 @@ export class MyBlogComponent implements OnInit {
     });
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.navSub = this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+       const u = this.authService.currentUser();
+       if (u && u.id) {
+         this.loadUserPosts(u.id);
+       }
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.navSub) this.navSub.unsubscribe();
+  }
 
   loadUserPosts(userId: string) {
     this.postService.getPostsByUser(userId).subscribe(posts => {

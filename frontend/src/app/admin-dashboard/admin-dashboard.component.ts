@@ -1,12 +1,15 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router, NavigationEnd } from '@angular/router';
 import { AdminService } from '../services/admin.service';
 import { ReportService } from '../services/report.service';
 import { PostService } from '../services/post.service';
 import { ThemeService } from '../services/theme.service';
 import { AuthService } from '../services/auth.service';
 import { MatIconModule } from '@angular/material/icon';
+import { filter } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -15,7 +18,7 @@ import { MatIconModule } from '@angular/material/icon';
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.scss'],
 })
-export class AdminDashboardComponent implements OnInit {
+export class AdminDashboardComponent implements OnInit, OnDestroy {
   overview: any = null;
   users: any[] = [];
   posts: any[] = [];
@@ -23,12 +26,15 @@ export class AdminDashboardComponent implements OnInit {
   loading = true;
   error = '';
   activeTab: 'overview' | 'users' | 'posts' | 'reports' = 'overview';
+  
+  private navSub: Subscription | null = null;
 
   confirmationData: {
     message: string;
     action: () => void;
   } | null = null;
 
+  private router = inject(Router);
   private admin = inject(AdminService);
   private postService = inject(PostService);
   private reportService = inject(ReportService);
@@ -51,6 +57,16 @@ export class AdminDashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.refresh();
+    
+    this.navSub = this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      this.refresh();
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.navSub) this.navSub.unsubscribe();
   }
 
   refresh() {
