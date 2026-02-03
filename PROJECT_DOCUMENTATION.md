@@ -5,7 +5,7 @@ This document outlines the major updates, architecture modernizations, and featu
 ## Core Mandates Addressed
 - **Replaced Emojis with Material Icons:** All emojis and `lucide-angular` icons have been replaced with standard Material Design icons for a professional look.
 - **Signal-Based State Management:** Migrated from legacy `BehaviorSubject` patterns to modern Angular Signals for reactive state.
-- **Real Media Uploads:** Implemented a full backend/frontend flow for local image uploads, moving away from simple URL strings.
+- **Real Media Uploads:** Implemented a full backend/frontend flow for cloud-based media uploads (Cloudinary), ensuring scalable and secure asset management.
 - **Form Validation:** Integrated Reactive Forms with real-time validation for authentication flows.
 
 ---
@@ -14,10 +14,10 @@ This document outlines the major updates, architecture modernizations, and featu
 
 ### Media Upload System
 - **Controller:** `MediaController.java`
+- **Service:** Cloudinary (External Cloud Storage)
 - **Endpoints:**
-  - `POST /api/media/upload`: Accepts `MultipartFile`, generates a unique UUID-based filename, and stores it in the `uploads/` directory.
-  - `GET /api/media/files/{filename}`: Publicly serves uploaded images with appropriate content-type probing.
-- **Security:** Updated `SecurityConfig.java` to permit public access to uploaded assets while keeping upload endpoints protected.
+  - `POST /api/media/upload`: Accepts `MultipartFile` (Image/Video), uploads it to Cloudinary, and returns the secure URL.
+- **Security:** Upload endpoints are protected. Access to media is handled via public Cloudinary URLs.
 
 ### Feed Logic
 - Enhanced `PostController` to correctly handle user feeds by combining posts from the current user and their followed authors using `FollowRepository`.
@@ -58,7 +58,7 @@ This document outlines the major updates, architecture modernizations, and featu
 ## 4. How to Run
 
 ### Backend
-1. Ensure a `uploads/` folder exists at the root of the backend directory.
+1. Configure Cloudinary credentials in `application.properties`.
 2. Run via Maven: `./mvnw spring-boot:run`.
 
 ### Frontend

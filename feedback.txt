@@ -1,0 +1,45 @@
+# Feedback for 01Blog Project
+
+## 1. General Assessment
+The project is well-structured and implements almost all required functionality. The separation of backend (Spring Boot) and frontend (Angular) follows standard practices, and the code quality is generally high.
+
+## 2. Functional Verification (Audit & Subject Requirements)
+
+### Core Features (Backend)
+- [x] **Project Structure:** Properly organized with `backend` and `frontend` directories.
+- [x] **Authentication:** Implemented using JWT, BCrypt, and Spring Security.
+- [x] **Role-Based Access:** `User` and `Admin` roles are correctly defined and enforced via `SecurityConfig`.
+- [x] **Media Upload:** Implemented and functional.
+    - **Note:** The documentation states that files are stored *locally* in an `uploads/` directory, but the code (`MediaController.java`) clearly uses **Cloudinary**. This functionality works, but the documentation should be updated to reflect the actual implementation, or the code changed if local storage was a strict constraint.
+- [x] **Database Relationships:** Entities (User, Post, Comment, Follow, Report) are correctly related.
+- [x] **Admin Functionality:**
+    - Admin can view statistics/overview.
+    - Admin can ban/unban users.
+    - Admin can delete users/posts.
+    - Admin can view and resolve reports.
+- [x] **Feed Logic:** `PostServiceImpl` correctly fetches the feed based on followed users.
+- [x] **Notifications:** Backend triggers notifications on new posts (`notificationService.notifyFollowers`).
+
+### Core Features (Frontend)
+- [x] **Modern Angular:** Uses Signals and Standalone components (Angular 17+ style), which is excellent.
+- [x] **Responsiveness:** Mobile menu and responsive grid layouts are present.
+- [x] **Admin Dashboard:** A comprehensive dashboard is implemented (`AdminDashboardComponent`).
+- [x] **Reporting:** A user-friendly dialog for reporting content is implemented (`ReportDialogComponent`).
+- [x] **Notifications UI:** Header includes a notification bell with unread badges and a dropdown list.
+- [x] **Dark Mode:** Implemented via `ThemeService`.
+- [x] **Infinite Scroll:** Implemented in the home feed.
+
+## 3. Discrepancies & Recommendations
+
+### Documentation Mismatch
+The primary issue found is the discrepancy regarding media storage:
+- **Docs:** "Stores it in the uploads/ directory."
+- **Code:** Uses `Cloudinary` API.
+**Action:** Update `PROJECT_DOCUMENTATION.md` to mention Cloudinary usage or switch to local storage if strict compliance with "file system" storage is required (though Cloudinary is generally better).
+
+### Minor Polish
+- **Security:** Ensure `jwt.secret` in `application.properties` is changed to a secure environment variable in production.
+- **UI:** The notification badge logic in the header is implemented, but ensure real-time updates are working smoothly (currently uses polling every 30s, which is acceptable).
+
+## 4. Conclusion
+The project is in a very strong state. It meets the "Functional," "Security," and "UI/UX" criteria, including the bonus features (Infinite Scroll, Dark Mode, Analytics). The only significant correction needed is aligning the documentation with the code regarding file uploads.

@@ -2,9 +2,15 @@ $font-serif: 'Playfair Display', serif;
 $font-sans: 'Inter', sans-serif;
 $primary: #818CF8;
 
+:host {
+  display: block;
+  height: 100%;
+}
+
 .blog-card {
   display: flex;
   flex-direction: column;
+  height: 100%;
   background: transparent; // Minimalist "White background" handled by page, cards blend in
   cursor: pointer;
   transition: transform 0.2s ease;

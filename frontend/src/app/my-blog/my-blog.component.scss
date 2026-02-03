@@ -241,6 +241,14 @@
 
 .card-wrapper {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  app-blog-card {
+    flex: 1;
+    height: auto;
+  }
 }
 
 .card-actions {
