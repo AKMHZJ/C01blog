@@ -107,8 +107,19 @@
     </div>
 
     <!-- 5. Content -->
-    <div class="post-content">
-      <markdown *ngFor="let paragraph of post.content" [data]="paragraph"></markdown>
+    <div class="post-content-container relative">
+      <div class="post-content" [class.collapsed]="!isPostExpanded && post.content.length > 1">
+        <markdown *ngFor="let paragraph of post.content" [data]="paragraph"></markdown>
+      </div>
+      
+      <!-- Gradient Overlay for Post -->
+      <div *ngIf="!isPostExpanded && post.content.length > 1" class="content-fade-overlay"></div>
+
+      <div class="read-more-wrapper" *ngIf="post.content.length > 1">
+        <button (click)="togglePostExpansion()" class="btn-outline-primary">
+          {{ isPostExpanded ? 'Show Less' : 'Read Full Story' }}
+        </button>
+      </div>
     </div>
 
     <!-- 6. Comments Section -->
@@ -154,7 +165,14 @@
                 </div>
               </div>
             } @else {
-              <p class="comment-text">{{ comment.text }}</p>
+              <div class="comment-content-wrapper">
+                <p class="comment-text">
+                  {{ (isCommentExpanded(comment.id) || !shouldTruncateComment(comment.text)) ? comment.text : (comment.text | slice:0:COMMENT_TRUNCATE_LIMIT) + '...' }}
+                </p>
+                <button *ngIf="shouldTruncateComment(comment.text)" (click)="toggleCommentExpansion(comment.id)" class="read-more-link">
+                  {{ isCommentExpanded(comment.id) ? 'Show Less' : 'Read More' }}
+                </button>
+              </div>
             }
           </div>
         </div>

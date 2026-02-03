@@ -60,6 +60,12 @@ export class PostPageComponent implements OnInit {
 
   // Media Carousel state
   currentMediaIndex: number = 0;
+  
+  // Read More / Truncation state
+  isPostExpanded = false;
+  expandedComments = new Set<string>();
+  readonly POST_TRUNCATE_LIMIT = 500; // Characters (approx) or use line-clamp in CSS
+  readonly COMMENT_TRUNCATE_LIMIT = 100;
 
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -262,5 +268,25 @@ export class PostPageComponent implements OnInit {
 
   goBack(): void {
     this.router.navigate(['/feed']);
+  }
+
+  togglePostExpansion() {
+    this.isPostExpanded = !this.isPostExpanded;
+  }
+
+  toggleCommentExpansion(commentId: string) {
+    if (this.expandedComments.has(commentId)) {
+      this.expandedComments.delete(commentId);
+    } else {
+      this.expandedComments.add(commentId);
+    }
+  }
+
+  isCommentExpanded(commentId: string): boolean {
+    return this.expandedComments.has(commentId);
+  }
+
+  shouldTruncateComment(text: string): boolean {
+    return text.length > this.COMMENT_TRUNCATE_LIMIT;
   }
 }
