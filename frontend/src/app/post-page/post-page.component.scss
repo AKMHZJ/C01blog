@@ -93,6 +93,9 @@ $secondary: #EF4444;
   font-weight: 700;
   line-height: 1.2;
   margin: 1rem 0 2rem;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
 }
 
 // 2. Author Section
@@ -275,6 +278,7 @@ $secondary: #EF4444;
 .post-content-container {
   margin-bottom: 4rem;
   position: relative;
+  min-width: 0;
 }
 
 .post-content {
@@ -282,9 +286,12 @@ $secondary: #EF4444;
   line-height: 1.6;
   transition: max-height 0.5s ease-out;
   overflow: hidden;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
 
   &.collapsed {
-    max-height: 200px; // Adjust based on desired initial height (approx 3-4 paragraphs)
+    max-height: 350px; // Adjust based on desired initial height (approx 3-4 paragraphs)
   }
 
   p {
@@ -409,6 +416,7 @@ $secondary: #EF4444;
 
 .comment-body {
   flex: 1;
+  min-width: 0; // Prevent overflow from long strings
 }
 
 .comment-header {
@@ -451,6 +459,10 @@ $secondary: #EF4444;
   opacity: 0.9;
   line-height: 1.5;
   white-space: pre-wrap;
+  // Handle long unbroken strings
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
 }
 
 .read-more-link {

@@ -274,6 +274,13 @@ export class PostPageComponent implements OnInit {
     this.isPostExpanded = !this.isPostExpanded;
   }
 
+  get shouldShowReadMore(): boolean {
+    if (!this.post || !this.post.content) return false;
+    const totalLength = this.post.content.join('').length;
+    // Show Read More if more than 3 paragraphs OR total text is long
+    return this.post.content.length > 3 || totalLength > 600;
+  }
+
   toggleCommentExpansion(commentId: string) {
     if (this.expandedComments.has(commentId)) {
       this.expandedComments.delete(commentId);

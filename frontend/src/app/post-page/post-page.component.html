@@ -108,14 +108,14 @@
 
     <!-- 5. Content -->
     <div class="post-content-container relative">
-      <div class="post-content" [class.collapsed]="!isPostExpanded && post.content.length > 1">
+      <div class="post-content" [class.collapsed]="!isPostExpanded && shouldShowReadMore">
         <markdown *ngFor="let paragraph of post.content" [data]="paragraph"></markdown>
       </div>
       
       <!-- Gradient Overlay for Post -->
-      <div *ngIf="!isPostExpanded && post.content.length > 1" class="content-fade-overlay"></div>
+      <div *ngIf="!isPostExpanded && shouldShowReadMore" class="content-fade-overlay"></div>
 
-      <div class="read-more-wrapper" *ngIf="post.content.length > 1">
+      <div class="read-more-wrapper" *ngIf="shouldShowReadMore">
         <button (click)="togglePostExpansion()" class="btn-outline-primary">
           {{ isPostExpanded ? 'Show Less' : 'Read Full Story' }}
         </button>
