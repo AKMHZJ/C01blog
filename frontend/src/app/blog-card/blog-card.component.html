@@ -20,7 +20,7 @@
   </div>
 
   <!-- 3. Title -->
-  <h3 class="card-title">{{ title }}</h3>
+  <h3 class="card-title" [title]="title">{{ title }}</h3>
 
   <!-- Stats Row (Likes and Comments) -->
   <div class="stats-row" *ngIf="likeCount > 0 || commentCount > 0">
