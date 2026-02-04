@@ -248,7 +248,18 @@ $transition-base: all 0.2s ease-in-out;
     transition: opacity 0.2s;
 
     &:hover { opacity: 1; }
+
+    option {
+      background: #fff;
+      color: #000;
+      text-transform: none; // Reset transform for readability in list
+    }
   }
+}
+
+.theme-dark .input-category option {
+  background: #121212; // Matching bg-dark
+  color: #fff;
 }
 
 // --- Toolbar ---
