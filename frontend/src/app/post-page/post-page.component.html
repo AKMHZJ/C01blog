@@ -23,7 +23,7 @@
         </div>
       </div>
       
-      <button (click)="openReport()" class="report-btn" title="Report Post">
+      <button (click)="openReport()" class="report-btn" title="Report Post" *ngIf="canReport">
         <mat-icon>flag</mat-icon>
         <span>Report</span>
       </button>

@@ -84,6 +84,13 @@ export class PostPageComponent implements OnInit {
     return this.theme.isDark();
   }
 
+  get canReport(): boolean {
+    if (!this.post || !this.currentUser) return false;
+    const isOwnPost = String(this.post.author?.id) === String(this.currentUser.id);
+    const isAuthorAdmin = this.post.author?.role === 'ADMIN';
+    return !isOwnPost && !isAuthorAdmin;
+  }
+
   get mediaToDisplay(): string[] {
     if (this.post?.mediaUrls && this.post.mediaUrls.length > 0) {
       return this.post.mediaUrls;

@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { ImageUrlPipe } from '../pipes/image-url.pipe';
 import { ReportDialogComponent } from '../report-dialog/report-dialog.component';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-blog-card',
@@ -26,6 +27,15 @@ export class BlogCardComponent {
   @Output() cardClick = new EventEmitter<void>();
 
   private dialog = inject(MatDialog);
+  private authService = inject(AuthService);
+
+  get canReport(): boolean {
+    const currentUser = this.authService.currentUser();
+    if (!currentUser || !this.author) return false;
+    const isOwnPost = String(this.author.id) === String(currentUser.id);
+    const isAuthorAdmin = this.author.role === 'ADMIN';
+    return !isOwnPost && !isAuthorAdmin;
+  }
 
   isVideo(url: string): boolean {
     if (!url) return false;

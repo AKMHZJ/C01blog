@@ -27,8 +27,17 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public Report createReport(Long reporterId, String postId, String reason) {
-        User reporter = userRepository.findById(reporterId).orElseThrow(() -> new RuntimeException("Reporter not found"));
-        Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found"));
+        User reporter = userRepository.findById(reporterId).orElseThrow(() -> new com._blog.exception.ResourceNotFoundException("Reporter not found"));
+        Post post = postRepository.findById(postId).orElseThrow(() -> new com._blog.exception.ResourceNotFoundException("Post not found"));
+
+        if (post.getAuthor() != null) {
+            if (post.getAuthor().getId().equals(reporterId)) {
+                throw new com._blog.exception.BadRequestException("You cannot report your own post.");
+            }
+            if (post.getAuthor().getRole() == Role.ADMIN) {
+                throw new com._blog.exception.BadRequestException("You cannot report an admin.");
+            }
+        }
 
         Report report = new Report(reporter, post, reason);
         return reportRepository.save(report);
